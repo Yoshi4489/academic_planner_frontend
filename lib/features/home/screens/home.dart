@@ -1,4 +1,5 @@
 import 'package:academic_planner_fe/features/home/widgets/gpa_summary_card.dart';
+import 'package:academic_planner_fe/features/home/widgets/quick_actions.dart';
 import 'package:flutter/material.dart';
 
 class Home extends StatelessWidget {
@@ -20,17 +21,23 @@ class Home extends StatelessWidget {
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("Welcome Back", style: Theme.of(context).textTheme.titleMedium),
-            Text("Ready to crush your goal?", style: Theme.of(context).textTheme.titleSmall,)
+            Text("Welcome Back", style: Theme.of(context).textTheme.headlineMedium),
+            Text("Ready to crush your goal?", style: Theme.of(context).textTheme.headlineSmall,)
           ]
         )
       ),
-      body: CustomScrollView(
-        slivers: [
-          SliverToBoxAdapter(
-            child: GPASummaryCard(),
-          )
-        ],
+      body: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: CustomScrollView(
+          slivers: [
+            SliverToBoxAdapter(
+              child: GPASummaryCard(),
+            ),
+            SliverToBoxAdapter(
+              child: QuickActions(),
+            )
+          ],
+        ),
       )
     );
   }
