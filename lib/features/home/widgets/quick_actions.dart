@@ -27,6 +27,7 @@ class QuickActions extends StatelessWidget {
     },
   ];
 
+  @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -34,19 +35,21 @@ class QuickActions extends StatelessWidget {
         const SizedBox(height: 20),
         Text("Quick Actions", style: Theme.of(context).textTheme.titleMedium),
         const SizedBox(height: 20),
-        GridView.builder(
-          shrinkWrap: true,
-          physics: NeverScrollableScrollPhysics(),
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 4,
-            crossAxisSpacing: 10,
-            mainAxisSpacing: 10
-          ),
-          itemCount: actions.length,
-          itemBuilder: (context, index) {
-            final btn = actions[index];
-            return _actionButton(context, btn['icon'], btn['label'] as String, btn['color'] as Color);
-          },
+        // Replace GridView with a responsive Row
+        Row(
+          children: actions.map((btn) {
+            return Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 10), // Spacing between buttons
+                child: _actionButton(
+                  context,
+                  btn['icon'],
+                  btn['label'] as String,
+                  btn['color'] as Color,
+                ),
+              ),
+            );
+          }).toList(),
         )
       ],
     );
@@ -54,34 +57,39 @@ class QuickActions extends StatelessWidget {
 }
 
 Widget _actionButton(
-  BuildContext context,
-  dynamic icon,
-  String label,
-  Color color,
-) {
+    BuildContext context,
+    dynamic icon,
+    String label,
+    Color color,
+    ) {
   return Column(
+    mainAxisSize: MainAxisSize.min,
     children: [
       GestureDetector(
         onTap: () {},
-        child: Container(
-          height: 50,
-          width: 50,
-          decoration: BoxDecoration(
-            color: color,
-            borderRadius: BorderRadius.circular(12),
-            boxShadow: [
-              BoxShadow(color: color.withOpacity(0.5), offset: Offset(0, 3)),
-            ],
-          ),
-          child: Center(
-            child: icon is IconData
-                ? Icon(icon, color: Colors.white)
-                : FaIcon(icon, color: Colors.white),
+        child: AspectRatio(
+          aspectRatio: 1,
+          child: Container(
+            decoration: BoxDecoration(
+              color: color,
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(color: color.withOpacity(0.4), offset: const Offset(0, 3), blurRadius: 2),
+              ],
+            ),
+            child: Center(
+              child: icon is IconData
+                  ? Icon(icon, color: Colors.white)
+                  : FaIcon(icon, color: Colors.white),
+            ),
           ),
         ),
       ),
-      const SizedBox(height: 5),
-      Text(label, style: Theme.of(context).textTheme.bodySmall),
+      const SizedBox(height: 8),
+      FittedBox(
+        fit: BoxFit.scaleDown,
+        child: Text(label, style: Theme.of(context).textTheme.bodySmall),
+      ),
     ],
   );
 }
