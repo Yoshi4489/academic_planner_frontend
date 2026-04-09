@@ -1,5 +1,6 @@
 import 'package:academic_planner_fe/features/home/widgets/gpa_summary_card.dart';
 import 'package:academic_planner_fe/features/home/widgets/quick_actions.dart';
+import 'package:academic_planner_fe/features/home/widgets/semester_list.dart';
 import 'package:flutter/material.dart';
 
 class Home extends StatelessWidget {
@@ -35,6 +36,9 @@ class Home extends StatelessWidget {
             ),
             SliverToBoxAdapter(
               child: QuickActions(),
+            ),
+            SliverToBoxAdapter(
+              child: SemesterList(),
             )
           ],
         ),

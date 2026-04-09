@@ -14,7 +14,8 @@ ThemeData lightMode = ThemeData(
     labelMedium: TextStyle(fontSize: 24, color: Colors.white, fontWeight: FontWeight.bold),
     labelSmall: TextStyle(fontSize: 16, color: Colors.white),
     titleMedium: TextStyle(fontSize: 24, color: Color.fromRGBO(0, 0, 0, 0.6)),
-    bodySmall: TextStyle(fontSize: 16, color: Colors.black)
+    bodyMedium: TextStyle(fontSize: 20, color: Colors.black),
+    bodySmall: TextStyle(fontSize: 16, color: Colors.black),
   ),
   fontFamily: GoogleFonts.inika().fontFamily
 );
