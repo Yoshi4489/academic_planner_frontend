@@ -4,8 +4,8 @@ import 'package:academic_planner_fe/features/home/widgets/quick_actions.dart';
 import 'package:academic_planner_fe/features/home/widgets/semester_list.dart';
 import 'package:flutter/material.dart';
 
-class Home extends StatelessWidget {
-  const Home({super.key});
+class HomeScreen extends StatelessWidget {
+  const HomeScreen({super.key});
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -20,6 +20,7 @@ class Home extends StatelessWidget {
           ),
         ),
         actions: [
+
           ThemeToggleButton()
         ],
         title: Column(

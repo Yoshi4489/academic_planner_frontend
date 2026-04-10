@@ -11,6 +11,15 @@ class UserModel {
     required this.createdAt,
   });
 
+  factory UserModel.fromJson(Map<String, dynamic> json) {
+    return UserModel(
+      id: json['id'] ?? '',
+      name: json['name'] ?? '',
+      email: json['email'] ?? '',
+      createdAt: json['created_at'] ?? ''
+    );
+  }
+
   UserModel copyWith({
     String? id,
     String? name,

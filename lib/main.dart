@@ -17,12 +17,12 @@ class MyApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final themeMode = ref.watch(themeProvider);
-    return MaterialApp(
+    return MaterialApp.router(
       title: 'Academic Planner App',
       theme: lightMode,
       darkTheme: darkMode,
       themeMode: themeMode,
-      routes: router
+      routerConfig: router,
     );
   }
 }
