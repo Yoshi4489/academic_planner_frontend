@@ -1,10 +1,13 @@
-import 'package:academic_planner_fe/routes/app_router.dart';
-import 'package:academic_planner_fe/theme/theme_provider.dart';
+import 'package:academic_planner_fe/core/routes/app_router.dart';
+import 'package:academic_planner_fe/core/theme/theme_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:academic_planner_fe/theme/theme.dart';
+import 'package:academic_planner_fe/core/theme/theme.dart';
+import 'package:hive_flutter/adapters.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Hive.initFlutter();
   runApp(ProviderScope(child: MyApp()));
 }
 

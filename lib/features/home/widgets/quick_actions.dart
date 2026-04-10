@@ -50,7 +50,8 @@ class QuickActions extends StatelessWidget {
               ),
             );
           }).toList(),
-        )
+        ),
+        SizedBox(height: 20),
       ],
     );
   }

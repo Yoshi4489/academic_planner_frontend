@@ -1,4 +1,4 @@
-import 'package:academic_planner_fe/theme/theme_provider.dart';
+import 'package:academic_planner_fe/core/theme/theme_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
