@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class AuthTextField extends StatefulWidget {
@@ -7,6 +6,9 @@ class AuthTextField extends StatefulWidget {
   final TextInputType type;
   final String hintText;
   final IconData? trailing;
+  final TextEditingController? controller;
+  final Function() validator;
+
   const AuthTextField({
     super.key,
     this.label,
@@ -14,12 +16,15 @@ class AuthTextField extends StatefulWidget {
     required this.type,
     required this.hintText,
     this.trailing,
+    this.controller,
+    required this.validator,
   });
   @override
   State<AuthTextField> createState() => _AuthTextField();
 }
 
 class _AuthTextField extends State<AuthTextField> {
+  bool isVisible = false;
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -27,9 +32,12 @@ class _AuthTextField extends State<AuthTextField> {
         if (widget.label != null)
           Align(
             alignment: Alignment.centerLeft,
-            child: Text(widget.label!, style: Theme.of(context).textTheme.bodyMedium),
+            child: Text(
+              widget.label!,
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
           ),
-          const SizedBox(height: 10),
+        const SizedBox(height: 10),
         Container(
           padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
           decoration: BoxDecoration(
@@ -41,18 +49,36 @@ class _AuthTextField extends State<AuthTextField> {
               Icon(widget.icon),
               SizedBox(width: 10),
               Expanded(
-                child: TextField(
+                child: TextFormField(
+                  obscureText:
+                      widget.type == TextInputType.visiblePassword && !isVisible
+                      ? true
+                      : false,
                   keyboardType: widget.type,
                   decoration: InputDecoration(
                     border: InputBorder.none,
-                    hint: Text(widget.hintText, style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.grey.shade400),)
+                    hintText: widget.hintText,
+                    hintStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: Colors.grey.shade400,
+                    ),
                   ),
+                  validator: (value) => widget.validator(),
                 ),
               ),
-              if(widget.trailing != null) Icon(widget.trailing)
+              if (widget.type == TextInputType.visiblePassword)
+                IconButton(
+                  onPressed: () {
+                    setState(() {
+                      isVisible = !isVisible;
+                    });
+                  },
+                  icon: Icon(isVisible ? Icons.visibility_off : Icons.visibility),
+                )
+              else if (widget.trailing != null)
+                Icon(widget.trailing!),
             ],
           ),
-        )
+        ),
       ],
     );
   }
