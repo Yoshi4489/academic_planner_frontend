@@ -39,7 +39,7 @@ class AuthController extends StateNotifier<AuthState> {
       }
       final response = await _apiService.refreshToken(token: token);
       state = state.copyWith(
-        error: null,
+        error: "",
         isLoading: false,
         user: UserModel.fromJson(response['user']),
         accessToken: response['access_token']
@@ -53,9 +53,11 @@ class AuthController extends StateNotifier<AuthState> {
   }
 
   Future<void> signUp(String name, String email, String password) async {
+    if (state.isLoading) return;
+
     try {
-      state = state.copyWith(isLoading: true, error: null);
-      final response = await _apiService.signUp(name: name, email: email, password: password);
+      state = state.copyWith(isLoading: true, error: "");
+      final response = await _apiService.createAccount(name: name, email: email, password: password);
       state = state.copyWith(
         isLoading: false,
         user: UserModel.fromJson(response['user']),
@@ -72,9 +74,11 @@ class AuthController extends StateNotifier<AuthState> {
   }
 
   Future<void> signIn(String email, String password) async{
+    if (state.isLoading) return;
+
     try {
-      state = state.copyWith(isLoading: true, error: null);
-      final response = await _apiService.signIn(email: email, password: password);
+      state = state.copyWith(isLoading: true, error: "");
+      final response = await _apiService.signInAccount(email: email, password: password);
       state = state.copyWith(
         isLoading: false,
         user: UserModel.fromJson(response['user']),

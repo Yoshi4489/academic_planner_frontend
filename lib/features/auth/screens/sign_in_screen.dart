@@ -1,21 +1,19 @@
+import 'package:academic_planner_fe/features/auth/providers/auth_provider.dart';
 import 'package:academic_planner_fe/features/auth/widgets/auth_text_field.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:academic_planner_fe/features/auth/providers/auth_provider.dart';
+import 'package:go_router/go_router.dart';
 
-class SignUpScreen extends ConsumerStatefulWidget {
-  SignUpScreen({super.key});
-
+class SignInScreen extends ConsumerStatefulWidget {
+  const SignInScreen({super.key});
   @override
-  ConsumerState<SignUpScreen> createState() => _SignUpScreenState();
+  ConsumerState<SignInScreen> createState() => _SignInState();
 }
 
-class _SignUpScreenState extends ConsumerState<SignUpScreen> {
+class _SignInState extends ConsumerState<SignInScreen> {
   final _formKey = GlobalKey<FormState>();
   final passwordController = TextEditingController();
   final emailController = TextEditingController();
-  final nameController = TextEditingController();
 
   void _showSnackBar(String message) {
     if (!mounted) return;
@@ -23,13 +21,6 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
     final messenger = ScaffoldMessenger.of(context);
     messenger.hideCurrentSnackBar();
     messenger.showSnackBar(SnackBar(content: Text(message)));
-  }
-
-  String? nameValidator(String? value) {
-    if (value == null || value.isEmpty) {
-      return "Name cannot be empty";
-    }
-    return null;
   }
 
   String? emailValidator(String? value) {
@@ -45,11 +36,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
 
   String? passwordValidator(String? value) {
     if (value == null || value.isEmpty) {
-      return "Password cannot be empty";
-    }
-
-    if (value.length < 8 || value.length > 32) {
-      return "Password must be between 8 and 32 characters long";
+      return 'Password cannot be empty';
     }
     return null;
   }
@@ -58,7 +45,6 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
   void dispose() {
     passwordController.dispose();
     emailController.dispose();
-    nameController.dispose();
     super.dispose();
   }
 
@@ -66,66 +52,53 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
   Widget build(BuildContext context) {
     final authState = ref.watch(authProvider);
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.surface,
       body: SafeArea(
         child: Stack(
           children: [
             Positioned(
-              top: 10,
-              left: 10,
               child: IconButton(
-                icon: Icon(Icons.arrow_back),
                 onPressed: () {
                   GoRouter.of(context).pop();
                 },
+                icon: Icon(Icons.arrow_back),
               ),
             ),
             Center(
               child: SingleChildScrollView(
                 child: Padding(
-                  padding: const EdgeInsets.all(20.0),
+                  padding: EdgeInsets.all(20),
                   child: Form(
                     key: _formKey,
                     child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "Create Account",
+                          "Sign In",
                           style: Theme.of(context).textTheme.headlineLarge,
                         ),
                         Text(
-                          "Join our academia and plan your success today.",
+                          "Hop on our academia and plan your success today.",
                           style: Theme.of(
                             context,
                           ).textTheme.headlineSmall?.copyWith(fontSize: 18),
                         ),
                         const SizedBox(height: 40),
                         AuthTextField(
-                          icon: Icons.person,
-                          type: TextInputType.text,
-                          hintText: "Enter your name",
-                          label: "Username",
-                          controller: nameController,
-                          validator: nameValidator,
-                        ),
-                        const SizedBox(height: 20),
-                        AuthTextField(
+                          label: "Email",
                           icon: Icons.email,
                           type: TextInputType.emailAddress,
                           hintText: "Enter your email",
-                          label: "Email",
-                          controller: emailController,
                           validator: emailValidator,
+                          controller: emailController,
                         ),
                         const SizedBox(height: 20),
                         AuthTextField(
                           icon: Icons.lock,
                           type: TextInputType.visiblePassword,
                           hintText: "Enter your password",
-                          label: "Password",
-                          controller: passwordController,
                           validator: passwordValidator,
+                          controller: passwordController,
                         ),
                         const SizedBox(height: 20),
                         SizedBox(
@@ -134,39 +107,37 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                             onPressed: authState.isLoading
                                 ? null
                                 : () async {
-                                    if (ref.read(authProvider).isLoading) {
-                                      return;
-                                    }
+                                    try {
+                                      if (ref.read(authProvider).isLoading) {
+                                        return;
+                                      }
 
-                                    if (_formKey.currentState!.validate()) {
-                                      try {
+                                      if (_formKey.currentState!.validate()) {
                                         await ref
                                             .read(authProvider.notifier)
-                                            .signUp(
-                                              nameController.text,
+                                            .signIn(
                                               emailController.text,
                                               passwordController.text,
                                             );
 
                                         final state = ref.read(authProvider);
+
                                         if (state.error != "") {
                                           _showSnackBar(
-                                            "Signup failed${state.error}",
+                                            "Sign In failed${state.error}",
                                           );
                                           return;
                                         }
 
-                                        _showSnackBar(
-                                          "Account created successfully!",
-                                        );
+                                        _showSnackBar("Login Successfully");
 
                                         if (!mounted) return;
-                                        GoRouter.of(context).goNamed("home");
-                                      } catch (e) {
-                                        _showSnackBar(
-                                          "Signup failed: ${e.toString()}",
-                                        );
+                                        GoRouter.of(context).goNamed('home');
                                       }
+                                    } catch (e) {
+                                      _showSnackBar(
+                                        "Sign In failed: ${e.toString()}",
+                                      );
                                     }
                                   },
                             style: ElevatedButton.styleFrom(
@@ -180,7 +151,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                               ),
                             ),
                             child: Text(
-                              "Sign Up",
+                              "Sign In",
                               style: Theme.of(context).textTheme.bodyMedium
                                   ?.copyWith(color: Colors.white),
                             ),
@@ -191,15 +162,15 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
-                              "Already have an account? ",
+                              "Don't have an account? ",
                               style: Theme.of(context).textTheme.bodySmall,
                             ),
                             GestureDetector(
                               onTap: () {
-                                GoRouter.of(context).pushNamed("sign-in");
+                                GoRouter.of(context).pop();
                               },
                               child: Text(
-                                "Sign In",
+                                "Sign Up",
                                 style: Theme.of(context).textTheme.bodySmall
                                     ?.copyWith(
                                       color: Theme.of(

@@ -7,6 +7,7 @@ ThemeData lightMode = ThemeData(
     surface: Colors.grey.shade300,
     primary: Color.fromRGBO(31, 93, 252, 1),
     secondary: Colors.grey.shade200,
+    tertiary: Colors.black
   ),
   textTheme: TextTheme(
     headlineLarge: TextStyle(fontSize: 40, fontWeight: FontWeight.bold),
@@ -31,6 +32,7 @@ ThemeData darkMode = ThemeData(
     surface: Color.fromRGBO(15, 23, 42, 1),
     primary: Color.fromRGBO(31, 93, 252, 100),
     secondary: Colors.grey.shade700,
+    tertiary: Colors.white
   ),
   textTheme: TextTheme(
     headlineLarge: TextStyle(

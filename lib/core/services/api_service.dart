@@ -3,12 +3,12 @@ import 'package:dio/dio.dart';
 class ApiService {
   final Dio _dio = Dio(
     BaseOptions(
-      baseUrl: "http://localhost:8080/api/v1",
+      baseUrl: "http://192.168.1.42:8080/api/v1",
       headers: {'Content-Type': 'application/json'},
     ),
   );
 
-  Future<Map<String, dynamic>> signUp({
+  Future<Map<String, dynamic>> createAccount({
     required String name,
     required String email,
     required String password,
@@ -20,11 +20,12 @@ class ApiService {
       );
       return response.data;
     } on DioException catch (e) {
+      print(e);
       throw Exception(e.response?.data['message'] ?? "Something went wrong");
     }
   }
 
-  Future<Map<String, dynamic>> signIn({
+  Future<Map<String, dynamic>> signInAccount({
     required String email,
     required String password,
   }) async {

@@ -2,7 +2,7 @@ class UserModel {
   final String id;
   final String name;
   final String email;
-  final DateTime createdAt;
+  final String createdAt;
 
   UserModel({
     required this.id,
@@ -24,7 +24,7 @@ class UserModel {
     String? id,
     String? name,
     String? email,
-    DateTime? createdAt,
+    String? createdAt,
   }) {
     return UserModel(
       id: id ?? this.id,

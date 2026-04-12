@@ -7,7 +7,7 @@ class AuthTextField extends StatefulWidget {
   final String hintText;
   final IconData? trailing;
   final TextEditingController? controller;
-  final Function() validator;
+  final Function(String?) validator;
 
   const AuthTextField({
     super.key,
@@ -50,6 +50,7 @@ class _AuthTextField extends State<AuthTextField> {
               SizedBox(width: 10),
               Expanded(
                 child: TextFormField(
+                  controller: widget.controller,
                   obscureText:
                       widget.type == TextInputType.visiblePassword && !isVisible
                       ? true
@@ -62,7 +63,7 @@ class _AuthTextField extends State<AuthTextField> {
                       color: Colors.grey.shade400,
                     ),
                   ),
-                  validator: (value) => widget.validator(),
+                  validator: (value) => widget.validator(value),
                 ),
               ),
               if (widget.type == TextInputType.visiblePassword)
