@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:go_router/go_router.dart';
 
 class QuickActions extends StatelessWidget {
   QuickActions({super.key});
@@ -9,21 +10,25 @@ class QuickActions extends StatelessWidget {
       "label": "Term",
       "icon": Icons.add,
       "color": Color.fromRGBO(7, 116, 240, 0.76),
+      "route": "terms"
     },
     {
       "label": "Course",
       "icon": FontAwesomeIcons.bookOpen,
       "color": Color.fromRGBO(178, 5, 255, 1),
+      "route": "home"
     },
     {
       "label": "Goal",
       "icon": FontAwesomeIcons.bullseye,
       "color": Color.fromRGBO(27, 228, 9, 1),
+      "route": "home"
     },
     {
       "label": "Graph",
       "icon": FontAwesomeIcons.chartLine,
       "color": Color.fromRGBO(255, 157, 0, 1),
+      "route": "home"
     },
   ];
 
@@ -35,17 +40,17 @@ class QuickActions extends StatelessWidget {
         const SizedBox(height: 20),
         Text("Quick Actions", style: Theme.of(context).textTheme.titleMedium),
         const SizedBox(height: 20),
-        // Replace GridView with a responsive Row
         Row(
           children: actions.map((btn) {
             return Expanded(
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 10), // Spacing between buttons
+                padding: const EdgeInsets.symmetric(horizontal: 10),
                 child: _actionButton(
                   context,
                   btn['icon'],
                   btn['label'] as String,
                   btn['color'] as Color,
+                  btn['route'] as String
                 ),
               ),
             );
@@ -62,12 +67,15 @@ Widget _actionButton(
     dynamic icon,
     String label,
     Color color,
+    String route
     ) {
   return Column(
     mainAxisSize: MainAxisSize.min,
     children: [
       GestureDetector(
-        onTap: () {},
+        onTap: () {
+          GoRouter.of(context).goNamed(route);
+        },
         child: AspectRatio(
           aspectRatio: 1,
           child: Container(

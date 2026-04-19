@@ -1,28 +1,76 @@
 import 'package:dio/dio.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:go_router/go_router.dart';
+import '../routes/app_router.dart';
 
 class ApiService {
-  final Dio _dio = Dio(
-    BaseOptions(
-      baseUrl: "http://192.168.1.42:8080/api/v1",
-      headers: {'Content-Type': 'application/json'},
-    ),
-  );
+  final FlutterSecureStorage _storage = const FlutterSecureStorage();
+  final String? Function() getAccessToken;
+  late final Dio _dio;
+  late final Dio _refreshDio;
 
-  Future<Map<String, dynamic>> createAccount({
-    required String name,
-    required String email,
-    required String password,
-  }) async {
-    try {
-      final response = await _dio.post(
-        '/auth/register',
-        data: {"name": name, "email": email, "password": password},
-      );
-      return response.data;
-    } on DioException catch (e) {
-      print(e);
-      throw Exception(e.response?.data['message'] ?? "Something went wrong");
-    }
+  ApiService(String? accessToken, {required this.getAccessToken}) {
+    _dio = Dio(BaseOptions(
+      baseUrl: "http://192.168.1.40:8080/api/v1",
+      headers: {'Content-Type': 'application/json'},
+      connectTimeout: const Duration(seconds: 15),
+      receiveTimeout: const Duration(seconds: 15),
+    ));
+
+    _refreshDio = Dio(BaseOptions(
+      baseUrl: "http://192.168.1.40:8080/api/v1",
+      headers: {'Content-Type': 'application/json'},
+    ));
+
+    _dio.interceptors.add(_authInterceptor());
+  }
+
+  InterceptorsWrapper _authInterceptor() {
+    return InterceptorsWrapper(
+      onRequest: (options, handler) {
+        final token = getAccessToken();
+        if (token != null) {
+          options.headers['Authorization'] = 'Bearer $token';
+        }
+        handler.next(options);
+      },
+
+      onError: (error, handler) async {
+        if (error.response?.statusCode == 401) {
+          try {
+            final refreshToken = await _storage.read(key: 'refresh_token');
+            if (refreshToken == null) {
+              await _onRefreshFailed();
+              return;
+            }
+
+            final response = await _refreshDio.post(
+              '/auth/refresh-token',
+              options: Options(headers: {'Authorization': 'Bearer $refreshToken'}),
+            );
+
+            final newAccessToken = response.data['access_token'];
+            final newRefreshToken = response.data['refresh_token'];
+
+            await _storage.write(key: 'refresh_token', value: newRefreshToken);
+
+            final opts = error.requestOptions;
+            opts.headers['Authorization'] = 'Bearer $newAccessToken';
+            final retried = await _dio.fetch(opts);
+            return handler.resolve(retried);
+
+          } catch (e) {
+            await _onRefreshFailed();
+          }
+        }
+        handler.next(error);
+      },
+    );
+  }
+
+  Future<void> _onRefreshFailed() async {
+    await _storage.deleteAll();
+    navigatorKey.currentContext?.goNamed('sign-in');
   }
 
   Future<Map<String, dynamic>> signInAccount({
@@ -30,25 +78,63 @@ class ApiService {
     required String password,
   }) async {
     try {
-      final response = await _dio.post(
-        "/auth/login",
-        data: {"email": email, "password": password},
-      );
+      final response = await _dio.post('/auth/login', data: {
+        'email': email,
+        'password': password,
+      });
       return response.data;
     } on DioException catch (e) {
-      throw Exception(e.response?.data['message'] ?? "Something went wrong");
+      throw Exception(e.response?.data['message'] ?? 'Something went wrong');
+    }
+  }
+
+  Future<Map<String, dynamic>> createAccount({
+    required String name,
+    required String email,
+    required String password,
+  }) async {
+    try {
+      final response = await _dio.post('/auth/register', data: {
+        'name': name,
+        'email': email,
+        'password': password,
+      });
+      return response.data;
+    } on DioException catch (e) {
+      throw Exception(e.response?.data['message'] ?? 'Something went wrong');
     }
   }
 
   Future<Map<String, dynamic>> refreshToken({required String token}) async {
     try {
-      final response = await _dio.post(
-        "/auth/refresh-token",
-        options: Options(headers: {"Authorization": "Bearer $token"}),
+      final response = await _refreshDio.post(
+        '/auth/refresh-token',
+        options: Options(headers: {'Authorization': 'Bearer $token'}),
       );
       return response.data;
     } on DioException catch (e) {
-      throw Exception(e.response?.data['message'] ?? "Something went wrong");
+      throw Exception(e.response?.data['message'] ?? 'Something went wrong');
+    }
+  }
+
+  Future<Map<String, dynamic>> createTerm({
+    required String name,
+    required String term,
+    required int termNo,
+    required bool isComplete,
+    required String userId,
+  }) async {
+    try {
+      final response = await _dio.post('/semesters/addSemester', data: {
+        'name': name,
+        'term': term,
+        'term_no': termNo,
+        'is_complete': isComplete,
+        'user_id': userId,
+      });
+      return response.data;
+    } on DioException catch (e) {
+      throw Exception(e.response?.data['message'] ?? 'Something went wrong');
     }
   }
 }
