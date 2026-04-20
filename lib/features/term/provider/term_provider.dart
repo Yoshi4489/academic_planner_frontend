@@ -64,22 +64,22 @@ class TermController extends StateNotifier<TermState> {
   }
 
   Future<void> getTemrsByUserId() async {
-    if (state.isLoading) return;
-    try {
-      state = state.copyWith(isLoading: true, error: "");
-      final response = await _apiService.findTermsByUserId();
+      if (state.isLoading) return;
+      try {
+        state = state.copyWith(isLoading: true, error: "");
+        final response = await _apiService.findTermsByUserId();
 
-      final terms = (response['semesters'] as List)
-          .map((e) => TermModel.fromJson(e as Map<String, dynamic>))
-          .toList();
+        final terms = (response['semesters'] as List)
+            .map((e) => TermModel.fromJson(e as Map<String, dynamic>))
+            .toList();
 
-      state = state.copyWith(isLoading: false, error: "", terms: terms);
-    } on Exception catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        error: e.toString().replaceFirst("Exception: ", ""),
-      );
-    }
+        state = state.copyWith(isLoading: false, error: "", terms: terms);
+      } on Exception catch (e) {
+        state = state.copyWith(
+          isLoading: false,
+          error: e.toString().replaceFirst("Exception: ", ""),
+        );
+      }
   }
 }
 

@@ -1,8 +1,8 @@
 import 'package:academic_planner_fe/features/term/provider/term_provider.dart';
 import 'package:academic_planner_fe/features/term/widgets/term_card.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 class TermScreen extends ConsumerStatefulWidget {
   @override
@@ -38,18 +38,28 @@ class _TermStateScreen extends ConsumerState<TermScreen> {
       padding: EdgeInsets.all(20),
       child: SingleChildScrollView(
         child: Column(
-          children: state.terms
-              .map(
-                (term) => TermCard(
-                  year: term.year,
-                  term: term.term,
-                  termNo: term.term_no,
-                  isComplete: term.is_complete,
-                  courses: term.courses,
-                  gpa: term.gpas,
+          children: state.terms.map((term) {
+            return Column(
+              children: [
+                GestureDetector(
+                  onTap: () {
+                    GoRouter.of(context).pushNamed("term-details", pathParameters: {
+                      "termId": term.id.toString()
+                    });
+                  },
+                  child: TermCard(
+                    year: term.year,
+                    term: term.term,
+                    termNo: term.termNo,
+                    isComplete: term.isComplete,
+                    courses: term.courses,
+                    gpa: term.gpas,
+                  ),
                 ),
-              )
-              .toList(),
+                SizedBox(height: 10),
+              ],
+            );
+          }).toList(),
         ),
       ),
     );

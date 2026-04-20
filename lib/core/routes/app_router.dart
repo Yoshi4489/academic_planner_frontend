@@ -4,6 +4,7 @@ import 'package:academic_planner_fe/features/auth/screens/sign_up_screen.dart';
 import 'package:academic_planner_fe/features/home/screens/home_screen.dart';
 import 'package:academic_planner_fe/features/auth/screens/sign_in_screen.dart';
 import 'package:academic_planner_fe/features/term/screens/term_screen.dart';
+import 'package:academic_planner_fe/features/term/widgets/term_details.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -47,5 +48,13 @@ final router = GoRouter(
       name: "terms",
       builder: (context, data) => ScaffoldWithBottomNav(child: TermScreen()),
     ),
+    GoRoute(
+      path: "/terms/:termId",
+      name: "term-details",
+      builder: (context, data) {
+        final termId = data.pathParameters['termId'] ?? "";
+        return TermDetails(termId: termId);
+      }
+    )
   ],
 );

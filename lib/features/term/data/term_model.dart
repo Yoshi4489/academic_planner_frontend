@@ -2,10 +2,10 @@ class TermModel {
   String id;
   int year;
   String term;
-  int term_no;
-  bool is_complete;
-  String created_at;
-  String user_id;
+  int termNo;
+  bool isComplete;
+  String createdAt;
+  String userId;
   List<Map<String, dynamic>> courses;
   List<Map<String, dynamic>> gpas;
 
@@ -13,10 +13,10 @@ class TermModel {
     required this.id,
     required this.year,
     required this.term,
-    required this.term_no,
-    required this.is_complete,
-    required this.created_at,
-    required this.user_id,
+    required this.termNo,
+    required this.isComplete,
+    required this.createdAt,
+    required this.userId,
     required this.courses,
     required this.gpas,
   });
@@ -26,10 +26,10 @@ class TermModel {
       id: json["id"] ?? "",
       year: json["year"] ?? 0,
       term: json['term'] ?? "",
-      term_no: json['term_no'] ?? 0,
-      is_complete: json["is_complete"] ?? false,
-      created_at: json['created_at'] ?? "",
-      user_id: json['user_id'] ?? "",
+      termNo: json['term_no'] ?? 0,
+      isComplete: json["is_complete"] ?? false,
+      createdAt: json['created_at'] ?? "",
+      userId: json['user_id'] ?? "",
       courses: (json['courses'] as List<dynamic>? ?? [])
           .map((e) => Map<String, dynamic>.from(e as Map))
           .toList(),
@@ -43,10 +43,10 @@ class TermModel {
     String? id,
     int? year,
     String? term,
-    int? term_no,
-    bool? is_complete,
-    String? created_at,
-    String? user_id,
+    int? termNo,
+    bool? isComplete,
+    String? createdAt,
+    String? userId,
     List<Map<String, dynamic>>? courses,
     List<Map<String, dynamic>>? gpas,
   }) {
@@ -54,12 +54,14 @@ class TermModel {
       id: id ?? this.id,
       year: year ?? this.year,
       term: term ?? this.term,
-      term_no: term_no ?? this.term_no,
-      is_complete: is_complete ?? this.is_complete,
-      created_at: created_at ?? this.created_at,
-      user_id: user_id ?? this.user_id,
+      termNo: termNo ?? this.termNo,
+      isComplete: isComplete ?? this.isComplete,
+      createdAt: createdAt ?? this.createdAt,
+      userId: userId ?? this.userId,
       courses: courses ?? this.courses,
       gpas: gpas ?? this.gpas,
     );
   }
+
+  void operator [](String other) {}
 }

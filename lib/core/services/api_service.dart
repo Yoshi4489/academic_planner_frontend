@@ -152,4 +152,13 @@ class ApiService {
       throw Exception(e.response?.data['message'] ?? 'Something went wrong');
     }
   }
+
+  Future<Map<String, dynamic>> findTermById(String termId) async {
+    try {
+      final response = await _dio.get('/semesters/getSemesterById/$termId');
+      return response.data;
+    } on DioException catch(e) {
+      throw Exception(e.response?.data['message'] ?? "Something went wrong");
+    }
+  }
 }

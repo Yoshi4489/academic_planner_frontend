@@ -6,8 +6,9 @@ ThemeData lightMode = ThemeData(
   colorScheme: ColorScheme.light(
     surface: Colors.grey.shade300,
     primary: Color.fromRGBO(31, 93, 252, 1),
+    primaryContainer: Color.fromRGBO(23, 26, 82, 1),
     secondary: Colors.grey.shade200,
-    tertiary: Colors.black
+    tertiary: Colors.black,
   ),
   textTheme: TextTheme(
     headlineLarge: TextStyle(fontSize: 40, fontWeight: FontWeight.bold),
@@ -23,7 +24,7 @@ ThemeData lightMode = ThemeData(
     bodyMedium: TextStyle(fontSize: 20, color: Colors.black),
     bodySmall: TextStyle(fontSize: 16, color: Colors.black),
   ),
-  fontFamily: GoogleFonts.inika().fontFamily,
+  fontFamily: GoogleFonts.dmSans().fontFamily,
 );
 
 ThemeData darkMode = ThemeData(
@@ -31,8 +32,9 @@ ThemeData darkMode = ThemeData(
   colorScheme: ColorScheme.dark(
     surface: Color.fromRGBO(15, 23, 42, 1),
     primary: Color.fromRGBO(31, 93, 252, 100),
+    primaryContainer: Color.fromRGBO(23, 26, 82, 1),
     secondary: Colors.grey.shade700,
-    tertiary: Colors.white
+    tertiary: Colors.white,
   ),
   textTheme: TextTheme(
     headlineLarge: TextStyle(
@@ -56,5 +58,5 @@ ThemeData darkMode = ThemeData(
     bodyMedium: TextStyle(fontSize: 20, color: Colors.white),
     bodySmall: TextStyle(fontSize: 16, color: Colors.white),
   ),
-  fontFamily: GoogleFonts.inika().fontFamily,
+  fontFamily: GoogleFonts.dmSans().fontFamily,
 );
