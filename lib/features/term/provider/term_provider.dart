@@ -1,18 +1,25 @@
 import 'package:academic_planner_fe/core/services/api_service.dart';
+import 'package:academic_planner_fe/features/auth/providers/auth_provider.dart';
 import 'package:academic_planner_fe/features/term/data/term_model.dart';
 import 'package:flutter_riverpod/legacy.dart';
 
+const _termSentinel = Object();
+
 class TermState {
-  bool isLoading;
-  String? error;
-  List<TermModel>? terms;
+  final bool isLoading;
+  final String? error;
+  final List<TermModel> terms;
 
-  TermState({this.isLoading = false, this.error, this.terms});
+  TermState({this.isLoading = false, this.error, this.terms = const []});
 
-  TermState copyWith({bool? isLoading, String? error, List<TermModel>? terms}) {
+  TermState copyWith({
+    bool? isLoading,
+    Object? error = _termSentinel,
+    List<TermModel>? terms,
+  }) {
     return TermState(
       isLoading: isLoading ?? this.isLoading,
-      error: error ?? this.error,
+      error: error == _termSentinel ? this.error : error as String?,
       terms: terms ?? this.terms,
     );
   }
@@ -23,11 +30,63 @@ class TermController extends StateNotifier<TermState> {
 
   TermController(this._apiService) : super(TermState());
 
-  Future<void> addSemester(
-    String name,
-    String term,
-    int term_no,
-    bool is_complete,
-    String user_id,
-  ) async {}
+  Future<void> addSemester({
+    required String name,
+    required String term,
+    required int termNo,
+    required bool isComplete,
+    required String userId,
+  }) async {
+    if (state.isLoading) return;
+    try {
+      state = state.copyWith(isLoading: true, error: null);
+
+      final response = await _apiService.createTerm(
+        name: name,
+        term: term,
+        termNo: termNo,
+        isComplete: isComplete,
+        userId: userId,
+      );
+
+      final newTerm = TermModel.fromJson(response['semester']);
+      state = state.copyWith(
+        isLoading: false,
+        error: null,
+        terms: [...state.terms, newTerm],
+      );
+    } on Exception catch (e) {
+      state = state.copyWith(
+        isLoading: false,
+        error: e.toString().replaceFirst('Exception: ', ''),
+      );
+    }
+  }
+
+  Future<void> getTemrsByUserId() async {
+    if (state.isLoading) return;
+    try {
+      state = state.copyWith(isLoading: true, error: "");
+      final response = await _apiService.findTermsByUserId();
+
+      final terms = (response['semesters'] as List)
+          .map((e) => TermModel.fromJson(e as Map<String, dynamic>))
+          .toList();
+
+      state = state.copyWith(isLoading: false, error: "", terms: terms);
+    } on Exception catch (e) {
+      state = state.copyWith(
+        isLoading: false,
+        error: e.toString().replaceFirst("Exception: ", ""),
+      );
+    }
+  }
 }
+
+final termProvider = StateNotifierProvider<TermController, TermState>((ref) {
+  final apiService = ApiService(
+    getAccessToken: () => ref.read(authProvider).accessToken,
+  );
+
+  return TermController(apiService);
+});

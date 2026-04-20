@@ -6,6 +6,8 @@ class TermModel {
   bool is_complete;
   String created_at;
   String user_id;
+  List<Map<String, dynamic>> courses;
+  List<Map<String, dynamic>> gpas;
 
   TermModel({
     required this.id,
@@ -15,6 +17,8 @@ class TermModel {
     required this.is_complete,
     required this.created_at,
     required this.user_id,
+    required this.courses,
+    required this.gpas,
   });
 
   factory TermModel.fromJson(Map<String, dynamic> json) {
@@ -23,9 +27,15 @@ class TermModel {
       year: json["year"] ?? 0,
       term: json['term'] ?? "",
       term_no: json['term_no'] ?? 0,
-      is_complete: json["is_complete"],
+      is_complete: json["is_complete"] ?? false,
       created_at: json['created_at'] ?? "",
       user_id: json['user_id'] ?? "",
+      courses: (json['courses'] as List<dynamic>? ?? [])
+          .map((e) => Map<String, dynamic>.from(e as Map))
+          .toList(),
+      gpas: (json['gpas'] as List<dynamic>? ?? [])
+          .map((e) => Map<String, dynamic>.from(e as Map))
+          .toList(),
     );
   }
 
@@ -37,6 +47,8 @@ class TermModel {
     bool? is_complete,
     String? created_at,
     String? user_id,
+    List<Map<String, dynamic>>? courses,
+    List<Map<String, dynamic>>? gpas,
   }) {
     return TermModel(
       id: id ?? this.id,
@@ -46,6 +58,8 @@ class TermModel {
       is_complete: is_complete ?? this.is_complete,
       created_at: created_at ?? this.created_at,
       user_id: user_id ?? this.user_id,
+      courses: courses ?? this.courses,
+      gpas: gpas ?? this.gpas,
     );
   }
 }

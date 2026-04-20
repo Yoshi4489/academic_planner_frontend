@@ -1,14 +1,27 @@
 import 'package:academic_planner_fe/core/routes/app_router.dart';
 import 'package:academic_planner_fe/core/theme/theme_provider.dart';
+import 'package:academic_planner_fe/features/auth/providers/auth_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:academic_planner_fe/core/theme/theme.dart';
-import 'package:hive_flutter/adapters.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Hive.initFlutter();
-  runApp(ProviderScope(child: MyApp()));
+
+  final container = ProviderContainer();
+
+  try {
+    await container.read(authProvider.notifier).initAuth();
+  } catch (e) {
+    debugPrint('initAuth failed: $e');
+  }
+
+  runApp(
+    UncontrolledProviderScope(
+      container: container,
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends ConsumerWidget {

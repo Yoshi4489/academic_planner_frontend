@@ -53,6 +53,7 @@ ThemeData darkMode = ThemeData(
     ),
     labelSmall: TextStyle(fontSize: 16, color: Colors.white),
     titleMedium: TextStyle(fontSize: 24, color: Colors.grey.shade300),
+    bodyMedium: TextStyle(fontSize: 20, color: Colors.white),
     bodySmall: TextStyle(fontSize: 16, color: Colors.white),
   ),
   fontFamily: GoogleFonts.inika().fontFamily,

@@ -124,7 +124,7 @@ class _SignInState extends ConsumerState<SignInScreen> {
 
                                         if (state.error != "") {
                                           _showSnackBar(
-                                            "Sign In failed${state.error}",
+                                            "Sign In failed: ${state.error}",
                                           );
                                           return;
                                         }

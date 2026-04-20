@@ -35,10 +35,7 @@ class AuthController extends StateNotifier<AuthState> {
   final FlutterSecureStorage _storage = const FlutterSecureStorage();
 
   AuthController() : super(AuthState()) {
-    _apiService = ApiService(
-      state.accessToken,
-      getAccessToken: () => state.accessToken,
-    );
+    _apiService = ApiService(getAccessToken: () => state.accessToken);
   }
 
   Future<void> initAuth() async {
@@ -55,7 +52,7 @@ class AuthController extends StateNotifier<AuthState> {
 
       state = state.copyWith(
         isLoading: false,
-        error: null,
+        error: "",
         user: UserModel.fromJson(response['user']),
         accessToken: response['access_token'],
       );
@@ -71,7 +68,7 @@ class AuthController extends StateNotifier<AuthState> {
   Future<void> signUp(String name, String email, String password) async {
     if (state.isLoading) return;
     try {
-      state = state.copyWith(isLoading: true, error: null);
+      state = state.copyWith(isLoading: true, error: "");
       final response = await _apiService.createAccount(
         name: name,
         email: email,
@@ -83,7 +80,7 @@ class AuthController extends StateNotifier<AuthState> {
       );
       state = state.copyWith(
         isLoading: false,
-        error: null,
+        error: "",
         user: UserModel.fromJson(response['user']),
         accessToken: response['access_token'],
       );
@@ -98,7 +95,7 @@ class AuthController extends StateNotifier<AuthState> {
   Future<void> signIn(String email, String password) async {
     if (state.isLoading) return;
     try {
-      state = state.copyWith(isLoading: true, error: null);
+      state = state.copyWith(isLoading: true, error: "");
       final response = await _apiService.signInAccount(
         email: email,
         password: password,
@@ -109,7 +106,7 @@ class AuthController extends StateNotifier<AuthState> {
       );
       state = state.copyWith(
         isLoading: false,
-        error: null,
+        error: "",
         user: UserModel.fromJson(response['user']),
         accessToken: response['access_token'],
       );
@@ -127,6 +124,6 @@ class AuthController extends StateNotifier<AuthState> {
   }
 }
 
-final authProvider = StateNotifierProvider<AuthController, AuthState>((ref) {
-  return AuthController();
-});
+final authProvider = StateNotifierProvider<AuthController, AuthState>(
+  (ref) => AuthController(),
+);
