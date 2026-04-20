@@ -1,7 +1,5 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:go_router/go_router.dart';
-import 'package:academic_planner_fe/core/routes/app_router.dart';
 
 class ApiService {
   final FlutterSecureStorage _storage = const FlutterSecureStorage();

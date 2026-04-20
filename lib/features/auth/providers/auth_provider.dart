@@ -41,21 +41,20 @@ class AuthController extends StateNotifier<AuthState> {
   Future<void> initAuth() async {
     try {
       final token = await _storage.read(key: 'refresh_token');
-      if (token == null) return;
+
+      if (token == null) {
+        return;
+      }
 
       final response = await _apiService.refreshToken(token: token);
 
-      await _storage.write(
-        key: 'refresh_token',
-        value: response['refresh_token'],
-      );
-
       state = state.copyWith(
         isLoading: false,
-        error: "",
+        error: null,
         user: UserModel.fromJson(response['user']),
         accessToken: response['access_token'],
       );
+
     } on Exception catch (e) {
       await _storage.deleteAll();
       state = state.copyWith(
@@ -64,7 +63,6 @@ class AuthController extends StateNotifier<AuthState> {
       );
     }
   }
-
   Future<void> signUp(String name, String email, String password) async {
     if (state.isLoading) return;
     try {

@@ -7,35 +7,50 @@ import 'package:academic_planner_fe/core/theme/theme.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  final container = ProviderContainer();
-
-  try {
-    await container.read(authProvider.notifier).initAuth();
-  } catch (e) {
-    debugPrint('initAuth failed: $e');
-  }
-
   runApp(
-    UncontrolledProviderScope(
-      container: container,
-      child: const MyApp(),
+    const ProviderScope(
+      child: MyApp(),
     ),
   );
 }
 
-class MyApp extends ConsumerWidget {
+class MyApp extends ConsumerStatefulWidget {
   const MyApp({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends ConsumerState<MyApp> {
+  bool _isInitializing = true;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await ref.read(authProvider.notifier).initAuth();
+      if (mounted) setState(() => _isInitializing = false);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final themeMode = ref.watch(themeProvider);
+
     return MaterialApp.router(
       title: 'Academic Planner App',
       theme: lightMode,
       darkTheme: darkMode,
       themeMode: themeMode,
       routerConfig: router,
+      builder: (context, child) {
+        if (_isInitializing) {
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
+        }
+        return child!;
+      },
     );
   }
 }
