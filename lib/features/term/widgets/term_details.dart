@@ -250,7 +250,6 @@ class _TermDetailsState extends ConsumerState<TermDetails> {
             ),
           ],
         ),
-        const SizedBox(height: 14),
         term.courses.isEmpty
             ? _EmptyState(
           icon: Icons.book_outlined,
