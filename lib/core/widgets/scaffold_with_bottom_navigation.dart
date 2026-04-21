@@ -10,7 +10,6 @@ class ScaffoldWithBottomNav extends StatelessWidget {
   static const List<String> _routes = [
     '/',
     '/terms',
-    '/courses',
     "/goals",
     '/graph',
   ];
@@ -36,10 +35,6 @@ class ScaffoldWithBottomNav extends StatelessWidget {
           BottomNavigationBarItem(
             icon: FaIcon(FontAwesomeIcons.plus),
             label: "Terms",
-          ),
-          BottomNavigationBarItem(
-            icon: FaIcon(FontAwesomeIcons.bookOpen),
-            label: "Courses",
           ),
           BottomNavigationBarItem(
             icon: FaIcon(FontAwesomeIcons.bullseye),

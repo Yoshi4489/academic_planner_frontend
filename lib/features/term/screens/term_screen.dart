@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:academic_planner_fe/features/term/provider/term_provider.dart';
 import 'package:academic_planner_fe/features/term/widgets/term_card.dart';
 import 'package:flutter/material.dart';
@@ -121,8 +123,15 @@ class _TermScreenState extends ConsumerState<TermScreen> {
   }
 
   double _calcAvgGpa(TermState state) {
-    final length = state.terms.length  - 1;
-    return state.terms[length].gpas[0].cumGpa;
+    if (state.terms.isEmpty) return 0.0;
+
+    state.terms.sort((a, b) {
+      final yearComparison = a.year.compareTo(b.year);
+      if (yearComparison != 0) return yearComparison;
+      return a.termNo.compareTo(b.termNo);
+    });
+
+    return state.terms.last.gpas.last.cumGpa;
   }
 }
 

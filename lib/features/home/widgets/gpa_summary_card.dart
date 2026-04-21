@@ -1,19 +1,59 @@
+import 'package:academic_planner_fe/features/term/provider/term_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class GPASummaryCard extends StatelessWidget {
+class GPASummaryCard extends ConsumerStatefulWidget {
   const GPASummaryCard({super.key});
 
   @override
+  ConsumerState<ConsumerStatefulWidget> createState() => _GPASummaryCardState();
+}
+
+class _GPASummaryCardState extends ConsumerState<GPASummaryCard> {
+  int totalCredits = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(termProvider.notifier).getTemrsByUserId();
+    });
+  }
+
+  double _calcAvgGpa(TermState state) {
+    if (state.terms.isEmpty) return 0.0;
+
+    state.terms.sort((a, b) {
+      final yearComparison = a.year.compareTo(b.year);
+      if (yearComparison != 0) return yearComparison;
+      return a.termNo.compareTo(b.termNo);
+    });
+
+    return state.terms.last.gpas.last.cumGpa;
+  }
+
+  int _calTotalCredits(TermState state) {
+    if (state.terms.isEmpty) return 0;
+
+    state.terms.sort((a, b) {
+      final yearComparison = a.year.compareTo(b.year);
+      if (yearComparison != 0) return yearComparison;
+      return a.termNo.compareTo(b.termNo);
+    });
+
+    return state.terms.last.gpas.last.totalCredit;
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final term = ref.watch(termProvider);
     return Card(
       color: Theme.of(context).colorScheme.primary,
       shadowColor: Theme.of(context).colorScheme.primary.withOpacity(0.4),
       elevation: 8,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(24),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
       child: Container(
         padding: const EdgeInsets.all(24),
         child: Column(
@@ -31,7 +71,11 @@ class GPASummaryCard extends StatelessWidget {
                     fontWeight: FontWeight.w600,
                   ),
                 ),
-                const FaIcon(FontAwesomeIcons.graduationCap, color: Colors.white, size: 20),
+                const FaIcon(
+                  FontAwesomeIcons.graduationCap,
+                  color: Colors.white,
+                  size: 20,
+                ),
               ],
             ),
             const SizedBox(height: 12),
@@ -40,7 +84,7 @@ class GPASummaryCard extends StatelessWidget {
               textBaseline: TextBaseline.alphabetic,
               children: [
                 Text(
-                  "3.85",
+                  "${_calcAvgGpa(term)}",
                   style: GoogleFonts.goblinOne(
                     fontSize: 48,
                     color: Colors.white,
@@ -64,7 +108,10 @@ class GPASummaryCard extends StatelessWidget {
               children: [
                 Expanded(
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.white.withOpacity(0.15),
                       borderRadius: BorderRadius.circular(16),
@@ -78,19 +125,21 @@ class GPASummaryCard extends StatelessWidget {
                       children: [
                         Text(
                           "Total Credits",
-                          style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                            color: Colors.white.withOpacity(0.8),
-                            fontWeight: FontWeight.w500,
-                          ),
+                          style: Theme.of(context).textTheme.labelSmall
+                              ?.copyWith(
+                                color: Colors.white.withOpacity(0.8),
+                                fontWeight: FontWeight.w500,
+                              ),
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          "42",
-                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            fontFamily: GoogleFonts.inriaSerif().fontFamily,
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                          ),
+                          _calTotalCredits(term).toString(),
+                          style: Theme.of(context).textTheme.titleMedium
+                              ?.copyWith(
+                                fontFamily: GoogleFonts.inriaSerif().fontFamily,
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
                         ),
                       ],
                     ),
@@ -99,9 +148,14 @@ class GPASummaryCard extends StatelessWidget {
                 const SizedBox(width: 16),
                 Expanded(
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
+                    ),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.15), // Lighter translucent background
+                      color: Colors.white.withOpacity(
+                        0.15,
+                      ), // Lighter translucent background
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(
                         color: Colors.white.withOpacity(0.3), // Softer border
@@ -113,19 +167,21 @@ class GPASummaryCard extends StatelessWidget {
                       children: [
                         Text(
                           "Next Goals",
-                          style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                            color: Colors.white.withOpacity(0.8),
-                            fontWeight: FontWeight.w500,
-                          ),
+                          style: Theme.of(context).textTheme.labelSmall
+                              ?.copyWith(
+                                color: Colors.white.withOpacity(0.8),
+                                fontWeight: FontWeight.w500,
+                              ),
                         ),
                         const SizedBox(height: 4),
                         Text(
                           "4.00",
-                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            fontFamily: GoogleFonts.inriaSerif().fontFamily,
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                          ),
+                          style: Theme.of(context).textTheme.titleMedium
+                              ?.copyWith(
+                                fontFamily: GoogleFonts.inriaSerif().fontFamily,
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
                         ),
                       ],
                     ),

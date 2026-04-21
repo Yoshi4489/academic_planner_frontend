@@ -1,6 +1,6 @@
 import 'package:academic_planner_fe/features/home/widgets/gpa_summary_card.dart';
 import 'package:academic_planner_fe/features/home/widgets/quick_actions.dart';
-import 'package:academic_planner_fe/features/home/widgets/semester_list.dart';
+import 'package:academic_planner_fe/features/home/widgets/term_list.dart';
 import 'package:flutter/material.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -13,7 +13,7 @@ class HomeScreen extends StatelessWidget {
         slivers: [
           SliverToBoxAdapter(child: GPASummaryCard()),
           SliverToBoxAdapter(child: QuickActions()),
-          SliverToBoxAdapter(child: SemesterList()),
+          SliverToBoxAdapter(child: TermList()),
         ],
       ),
     );
