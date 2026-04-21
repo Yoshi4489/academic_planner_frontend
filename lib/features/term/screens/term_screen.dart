@@ -1,5 +1,4 @@
-import 'dart:math';
-
+import 'package:academic_planner_fe/features/auth/providers/auth_provider.dart';
 import 'package:academic_planner_fe/features/term/provider/term_provider.dart';
 import 'package:academic_planner_fe/features/term/widgets/term_card.dart';
 import 'package:flutter/material.dart';
@@ -33,6 +32,14 @@ class _TermScreenState extends ConsumerState<TermScreen> {
 
   @override
   Widget build(BuildContext context) {
+    ref.listen(termProvider, (prev, next) {
+      if (next.error != "" && prev?.error != next.error) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(next.error ?? "Unknown error")),
+        );
+      }
+    });
+    
     final state = ref.watch(termProvider);
     final theme = Theme.of(context);
 
@@ -131,7 +138,11 @@ class _TermScreenState extends ConsumerState<TermScreen> {
       return a.termNo.compareTo(b.termNo);
     });
 
-    return state.terms.last.gpas.last.cumGpa;
+    final lastTerm = state.terms.last;
+
+    if (lastTerm.gpas.isEmpty) return 0.0;
+
+    return lastTerm.gpas.last.cumGpa;
   }
 }
 
@@ -311,13 +322,14 @@ class _AddTermSheet extends ConsumerStatefulWidget {
 class _AddTermSheetState extends ConsumerState<_AddTermSheet> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
-  String _selectedTerm = '1';
+  final _yearController = TextEditingController();
   int _selectedTermNo = 1;
   bool _isComplete = false;
 
   @override
   void dispose() {
     _nameController.dispose();
+    _yearController.dispose();
     super.dispose();
   }
 
@@ -325,6 +337,7 @@ class _AddTermSheetState extends ConsumerState<_AddTermSheet> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isLoading = ref.watch(termProvider).isLoading;
+    final userId = ref.watch(authProvider).user?.id;
 
     return SingleChildScrollView(
       child: Container(
@@ -342,7 +355,6 @@ class _AddTermSheetState extends ConsumerState<_AddTermSheet> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Handle bar
               Center(
                 child: Container(
                   width: 40,
@@ -354,75 +366,63 @@ class _AddTermSheetState extends ConsumerState<_AddTermSheet> {
                 ),
               ),
               const SizedBox(height: 20),
-              Text(
-                'Add New Term',
-                style: theme.textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 20),
-      
-              // Term name
+              Text("Add new Term"),
+              const SizedBox(height: 20,),
               TextFormField(
                 controller: _nameController,
                 decoration: InputDecoration(
-                  labelText: 'Term Name',
-                  hintText: 'e.g. First Semester 2025',
+                  labelText: "Term Name",
+                  hintText: "eg First Semester of ${DateTime.now().year.toString()}",
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  prefixIcon: const Icon(Icons.edit_outlined),
+                  prefix: const Icon(Icons.edit_outlined),
                 ),
-                validator: (v) =>
-                v == null || v.isEmpty ? 'Name is required' : null,
+                validator: (v) => v == null || v.isEmpty ? "Name is required" : null,
               ),
-              const SizedBox(height: 16),
-      
-              // Term & Term No row
+              const SizedBox(height: 20,),
               Row(
                 children: [
                   Expanded(
-                    child: DropdownButtonFormField<String>(
-                      value: _selectedTerm,
+                    child: TextFormField(
+                      controller: _yearController,
                       decoration: InputDecoration(
-                        labelText: 'Term',
+                        labelText: "Term year",
+                        hintText: "eg ${DateTime.now().year.toString()}",
                         border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(12)
                         ),
+                        prefix: const Icon(Icons.calendar_month),
                       ),
-                      items: ['1', '2', '3']
-                          .map((t) => DropdownMenuItem(
+                      validator: (v) {
+                        if (v == null || v.isEmpty) return "Year is required";
+                        if (int.tryParse(v) == null || int.parse(v) < 1) return "Please enter a valid year";
+                        return null; // Change "" to null
+                      },
+                    ),
+                  ),
+                  const SizedBox(width: 12,),
+                  Expanded(
+                    child: DropdownButtonFormField(
+                      value: _selectedTermNo,
+                      items: [1,2,3,4,5,6,7,8,9,10].map((t) => DropdownMenuItem(
                         value: t,
                         child: Text('Term $t'),
-                      ))
-                          .toList(),
-                      onChanged: (v) => setState(() => _selectedTerm = v!),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: DropdownButtonFormField<int>(
-                      value: _selectedTermNo,
+                      )).toList(),
                       decoration: InputDecoration(
-                        labelText: 'Semester No.',
+                        labelText: "Semester No.",
                         border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                      items: List.generate(8, (i) => i + 1)
-                          .map((n) => DropdownMenuItem(
-                        value: n,
-                        child: Text('Semester $n'),
-                      ))
-                          .toList(),
-                      onChanged: (v) => setState(() => _selectedTermNo = v!),
+                          borderRadius: BorderRadius.circular(12)
+                        )
+                      ), onChanged: (int? value) {
+                        setState(() {
+                          _selectedTermNo = value!;
+                        });
+                    },
                     ),
-                  ),
+                  )
                 ],
               ),
-              const SizedBox(height: 12),
-      
-              // Is complete toggle
               SwitchListTile(
                 value: _isComplete,
                 onChanged: (v) => setState(() => _isComplete = v),
@@ -430,26 +430,20 @@ class _AddTermSheetState extends ConsumerState<_AddTermSheet> {
                 contentPadding: EdgeInsets.zero,
               ),
               const SizedBox(height: 20),
-      
-              // Submit button
               SizedBox(
                 width: double.infinity,
-                child: FilledButton(
-                  onPressed: isLoading
-                      ? null
-                      : () async {
-                    if (!_formKey.currentState!.validate()) return;
-                    // TODO: wire up to termProvider.addSemester()
-                    Navigator.pop(context);
-                  },
+                child: FilledButton(onPressed: isLoading ? null : () async {
+                  if (!_formKey.currentState!.validate()) return;
+                  await ref.read(termProvider.notifier).addTerm(term: _nameController.text, termNo: _selectedTermNo, isComplete: _isComplete, userId: userId ?? "", year: int.parse(_yearController.text));
+                  GoRouter.of(context).pop();
+                },
                   style: FilledButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
+                      borderRadius: BorderRadiusGeometry.circular(12)
+                    )
                   ),
-                  child: isLoading
-                      ? const SizedBox(
+                  child: isLoading ? const SizedBox(
                     height: 20,
                     width: 20,
                     child: CircularProgressIndicator(
@@ -457,9 +451,9 @@ class _AddTermSheetState extends ConsumerState<_AddTermSheet> {
                       color: Colors.white,
                     ),
                   )
-                      : const Text('Add Term'),
+                  : const Text("Add Term")
                 ),
-              ),
+              )
             ],
           ),
         ),

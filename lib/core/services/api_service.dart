@@ -10,7 +10,7 @@ class ApiService {
   ApiService({required this.getAccessToken}) {
     _dio = Dio(
       BaseOptions(
-        baseUrl: "http://192.168.1.42:8080/api/v1",
+        baseUrl: "http://192.168.1.33:8080/api/v1",
         headers: {'Content-Type': 'application/json'},
         connectTimeout: const Duration(seconds: 15),
         receiveTimeout: const Duration(seconds: 15),
@@ -19,7 +19,7 @@ class ApiService {
 
     _refreshDio = Dio(
       BaseOptions(
-        baseUrl: "http://192.168.1.42:8080/api/v1",
+        baseUrl: "http://192.168.1.33:8080/api/v1",
         headers: {'Content-Type': 'application/json'},
       ),
     );
@@ -121,8 +121,8 @@ class ApiService {
   }
 
   Future<Map<String, dynamic>> createTerm({
-    required String name,
     required String term,
+    required int year,
     required int termNo,
     required bool isComplete,
     required String userId,
@@ -131,8 +131,8 @@ class ApiService {
       final response = await _dio.post(
         '/semesters/addSemester',
         data: {
-          'name': name,
           'term': term,
+          'year': year,
           'term_no': termNo,
           'is_complete': isComplete,
           'user_id': userId,

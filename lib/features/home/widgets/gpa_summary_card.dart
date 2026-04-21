@@ -35,15 +35,13 @@ class _GPASummaryCardState extends ConsumerState<GPASummaryCard> {
   }
 
   int _calTotalCredits(TermState state) {
-    if (state.terms.isEmpty) return 0;
+    int totalCredits = 0;
+    if (state.terms.isEmpty) return totalCredits;
 
-    state.terms.sort((a, b) {
-      final yearComparison = a.year.compareTo(b.year);
-      if (yearComparison != 0) return yearComparison;
-      return a.termNo.compareTo(b.termNo);
-    });
-
-    return state.terms.last.gpas.last.totalCredit;
+    for (var t in state.terms) {
+      totalCredits += t.gpas[0].totalCredit;
+    }
+    return totalCredits;
   }
 
   @override

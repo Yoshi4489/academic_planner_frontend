@@ -30,20 +30,20 @@ class TermController extends StateNotifier<TermState> {
 
   TermController(this._apiService) : super(TermState());
 
-  Future<void> addSemester({
-    required String name,
+  Future<void> addTerm({
     required String term,
+    required int year,
     required int termNo,
     required bool isComplete,
     required String userId,
   }) async {
     if (state.isLoading) return;
     try {
-      state = state.copyWith(isLoading: true, error: null);
+      state = state.copyWith(isLoading: true, error: "");
 
       final response = await _apiService.createTerm(
-        name: name,
         term: term,
+        year: year,
         termNo: termNo,
         isComplete: isComplete,
         userId: userId,
@@ -52,7 +52,7 @@ class TermController extends StateNotifier<TermState> {
       final newTerm = TermModel.fromJson(response['semester']);
       state = state.copyWith(
         isLoading: false,
-        error: null,
+        error: "",
         terms: [...state.terms, newTerm],
       );
     } on Exception catch (e) {
