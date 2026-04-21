@@ -38,6 +38,10 @@ extension TypeExtension on Type {
       orElse: () => Type.ACTUAL,
     );
   }
+
+  String get displayName {
+    return name;
+  }
 }
 
 class CourseModel {
