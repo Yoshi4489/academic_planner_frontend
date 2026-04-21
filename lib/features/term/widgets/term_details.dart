@@ -1,10 +1,11 @@
 import 'package:academic_planner_fe/features/term/provider/term_detail_provider.dart';
+import 'package:academic_planner_fe/features/term/widgets/course_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 class TermDetails extends ConsumerStatefulWidget {
-  final termId;
+  final String termId;
   const TermDetails({super.key, required this.termId});
   @override
   ConsumerState<TermDetails> createState() => _TermDetailsState();
@@ -23,6 +24,17 @@ class _TermDetailsState extends ConsumerState<TermDetails> {
   Widget build(BuildContext context) {
     final state = ref.watch(termDetailProvider);
     final term = state.term;
+    final courses = term?.courses;
+    final gpa = term!.gpas[0];
+    int totalCredit = 0;
+
+
+    if (courses!.isNotEmpty) {
+      for (var c in courses) {
+        totalCredit += c.credit;
+      }
+    }
+
 
     if (state.isLoading) {
       return const Center(child: CircularProgressIndicator());
@@ -64,7 +76,7 @@ class _TermDetailsState extends ConsumerState<TermDetails> {
                           style: Theme.of(context).textTheme.labelSmall,
                         ),
                         Text(
-                          term?.term ?? "",
+                          term.term,
                           style: Theme.of(context).textTheme.labelMedium,
                         ),
                       ],
@@ -72,7 +84,7 @@ class _TermDetailsState extends ConsumerState<TermDetails> {
                     Column(
                       children: [
                         Text(
-                          "4.00",
+                          gpa.gpa.toString(),
                           style: Theme.of(context).textTheme.labelMedium,
                         ),
                         Text(
@@ -99,13 +111,13 @@ class _TermDetailsState extends ConsumerState<TermDetails> {
                         Column(
                           children: [
                             Text("Total Credits"),
-                            Text("0")
+                            Text("$totalCredit")
                           ],
                         ),
                         Column(
                           children: [
                             Text("Status"),
-                            Text(term?.isComplete.toString() ?? "false")
+                            Text(term.isComplete.toString())
                           ],
                         )
                       ],
@@ -122,13 +134,13 @@ class _TermDetailsState extends ConsumerState<TermDetails> {
                             Column(
                               children: [
                                 Text("GPA"),
-                                Text("4.00")
+                                Text(gpa.gpa.toString())
                               ],
                             ),
                             Column(
                               children: [
                                 Text("CUM GPA"),
-                                Text("4.00")
+                                Text(gpa.cumGpa.toString())
                               ],
                             )
                           ],
@@ -150,9 +162,15 @@ class _TermDetailsState extends ConsumerState<TermDetails> {
                         ElevatedButton(onPressed: () {}, child: Text("+ Add Course"))
                       ],
                     ),
-                    Center(
-                      child: Text("Course will be here"),
-                    )
+                    SizedBox(height: 20,),
+                    ...courses.map((course) {
+                      return Column(
+                        children: [
+                          CourseCard(course: course),
+                          SizedBox(height: 15,)
+                        ],
+                      );
+                    })
                   ],
                 ),
               )
@@ -163,3 +181,4 @@ class _TermDetailsState extends ConsumerState<TermDetails> {
     );
   }
 }
+

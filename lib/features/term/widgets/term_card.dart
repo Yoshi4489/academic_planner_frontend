@@ -1,3 +1,5 @@
+import 'package:academic_planner_fe/features/term/data/course_model.dart';
+import 'package:academic_planner_fe/features/term/data/gpa_model.dart';
 import 'package:flutter/material.dart';
 
 class TermCard extends StatelessWidget {
@@ -5,8 +7,8 @@ class TermCard extends StatelessWidget {
   final String term;
   final int termNo;
   final bool isComplete;
-  final List<Map<String, dynamic>> courses;
-  final List<Map<String, dynamic>> gpa;
+  final List<CourseModel> courses;
+  final List<GpaModel> gpa;
 
   const TermCard({
     super.key,
@@ -21,6 +23,7 @@ class TermCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
+      shadowColor: Theme.of(context).colorScheme.tertiary,
       child: Padding(
         padding: EdgeInsets.all(10),
         child: Row(
@@ -46,7 +49,7 @@ class TermCard extends StatelessWidget {
               ),
             ),
             SizedBox(width: 10),
-            Text(gpa.isNotEmpty ? gpa[0]['gpa'].toString() : '-', style: Theme.of(context).textTheme.bodyMedium,),
+            Text(gpa.isNotEmpty ? gpa[0].gpa.toString() : '-', style: Theme.of(context).textTheme.bodyMedium,),
             Icon(Icons.arrow_right, color: Theme.of(context).colorScheme.tertiary,),
           ],
         ),

@@ -1,3 +1,6 @@
+import 'package:academic_planner_fe/features/term/data/course_model.dart';
+import 'package:academic_planner_fe/features/term/data/gpa_model.dart';
+
 class TermModel {
   String id;
   int year;
@@ -6,8 +9,8 @@ class TermModel {
   bool isComplete;
   String createdAt;
   String userId;
-  List<Map<String, dynamic>> courses;
-  List<Map<String, dynamic>> gpas;
+  List<CourseModel> courses;
+  List<GpaModel> gpas;
 
   TermModel({
     required this.id,
@@ -31,10 +34,10 @@ class TermModel {
       createdAt: json['created_at'] ?? "",
       userId: json['user_id'] ?? "",
       courses: (json['courses'] as List<dynamic>? ?? [])
-          .map((e) => Map<String, dynamic>.from(e as Map))
+          .map((e) => CourseModel.fromJson(e))
           .toList(),
       gpas: (json['gpas'] as List<dynamic>? ?? [])
-          .map((e) => Map<String, dynamic>.from(e as Map))
+          .map((e) => GpaModel.fromJson(e))
           .toList(),
     );
   }
@@ -47,8 +50,8 @@ class TermModel {
     bool? isComplete,
     String? createdAt,
     String? userId,
-    List<Map<String, dynamic>>? courses,
-    List<Map<String, dynamic>>? gpas,
+    List<CourseModel>? courses,
+    List<GpaModel>? gpas,
   }) {
     return TermModel(
       id: id ?? this.id,
@@ -62,6 +65,4 @@ class TermModel {
       gpas: gpas ?? this.gpas,
     );
   }
-
-  void operator [](String other) {}
 }

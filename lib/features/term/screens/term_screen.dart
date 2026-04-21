@@ -5,6 +5,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 class TermScreen extends ConsumerStatefulWidget {
+  const TermScreen({super.key});
+
   @override
   ConsumerState<TermScreen> createState() => _TermStateScreen();
 }
