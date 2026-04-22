@@ -5,11 +5,7 @@ class TermCard extends StatelessWidget {
   final TermModel term;
   final VoidCallback onTap;
 
-  const TermCard({
-    super.key,
-    required this.term,
-    required this.onTap,
-  });
+  const TermCard({super.key, required this.term, required this.onTap});
 
   Color _gpaColor(double gpa) {
     if (gpa >= 3.5) return const Color(0xFF22C55E);

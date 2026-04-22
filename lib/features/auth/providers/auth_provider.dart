@@ -1,4 +1,4 @@
-import 'package:academic_planner_fe/core/services/api_service.dart';
+import 'package:academic_planner_fe/core/services/auth_api_service.dart';
 import 'package:academic_planner_fe/features/auth/data/user_model.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -31,11 +31,11 @@ class AuthState {
 }
 
 class AuthController extends StateNotifier<AuthState> {
-  late final ApiService _apiService;
+  late final AuthApiService _apiService;
   final FlutterSecureStorage _storage = const FlutterSecureStorage();
 
   AuthController() : super(AuthState()) {
-    _apiService = ApiService(getAccessToken: () => state.accessToken);
+    _apiService = AuthApiService(getAccessToken: () => state.accessToken);
   }
 
   Future<void> initAuth() async {
@@ -54,7 +54,6 @@ class AuthController extends StateNotifier<AuthState> {
         user: UserModel.fromJson(response['user']),
         accessToken: response['access_token'],
       );
-
     } on Exception catch (e) {
       await _storage.deleteAll();
       state = state.copyWith(
@@ -63,11 +62,12 @@ class AuthController extends StateNotifier<AuthState> {
       );
     }
   }
+
   Future<void> signUp(String name, String email, String password) async {
     if (state.isLoading) return;
     try {
       state = state.copyWith(isLoading: true, error: "");
-      final response = await _apiService.createAccount(
+      final response = await _apiService.signUp(
         name: name,
         email: email,
         password: password,
@@ -94,7 +94,7 @@ class AuthController extends StateNotifier<AuthState> {
     if (state.isLoading) return;
     try {
       state = state.copyWith(isLoading: true, error: "");
-      final response = await _apiService.signInAccount(
+      final response = await _apiService.signIn(
         email: email,
         password: password,
       );

@@ -1,5 +1,5 @@
-import 'package:academic_planner_fe/core/services/api_service.dart';
-import 'package:academic_planner_fe/features/auth/providers/auth_provider.dart';
+import 'package:academic_planner_fe/core/providers/api_providers.dart';
+import 'package:academic_planner_fe/core/services/term_api_service.dart';
 import 'package:academic_planner_fe/features/term/data/term_model.dart';
 import 'package:flutter_riverpod/legacy.dart';
 
@@ -26,7 +26,7 @@ class TermState {
 }
 
 class TermController extends StateNotifier<TermState> {
-  final ApiService _apiService;
+  final TermApiService _apiService;
 
   TermController(this._apiService) : super(TermState());
 
@@ -35,7 +35,6 @@ class TermController extends StateNotifier<TermState> {
     required int year,
     required int termNo,
     required bool isComplete,
-    required String userId,
   }) async {
     if (state.isLoading) return;
     try {
@@ -46,7 +45,6 @@ class TermController extends StateNotifier<TermState> {
         year: year,
         termNo: termNo,
         isComplete: isComplete,
-        userId: userId,
       );
 
       final newTerm = TermModel.fromJson(response['semester']);
@@ -64,29 +62,25 @@ class TermController extends StateNotifier<TermState> {
   }
 
   Future<void> getTemrsByUserId() async {
-      if (state.isLoading) return;
-      try {
-        state = state.copyWith(isLoading: true, error: "");
-        final response = await _apiService.findTermsByUserId();
+    if (state.isLoading) return;
+    try {
+      state = state.copyWith(isLoading: true, error: "");
+      final response = await _apiService.findTermsByUserId();
 
-        final terms = (response['semesters'] as List)
-            .map((e) => TermModel.fromJson(e as Map<String, dynamic>))
-            .toList();
+      final terms = (response['semesters'] as List)
+          .map((e) => TermModel.fromJson(e as Map<String, dynamic>))
+          .toList();
 
-        state = state.copyWith(isLoading: false, error: "", terms: terms);
-      } on Exception catch (e) {
-        state = state.copyWith(
-          isLoading: false,
-          error: e.toString().replaceFirst("Exception: ", ""),
-        );
-      }
+      state = state.copyWith(isLoading: false, error: "", terms: terms);
+    } on Exception catch (e) {
+      state = state.copyWith(
+        isLoading: false,
+        error: e.toString().replaceFirst("Exception: ", ""),
+      );
+    }
   }
 }
 
 final termProvider = StateNotifierProvider<TermController, TermState>((ref) {
-  final apiService = ApiService(
-    getAccessToken: () => ref.read(authProvider).accessToken,
-  );
-
-  return TermController(apiService);
+  return TermController(ref.read(termApiServiceProvider));
 });

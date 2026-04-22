@@ -1,7 +1,7 @@
-import 'package:academic_planner_fe/features/term/data/course_model.dart';
 import 'package:academic_planner_fe/features/term/data/gpa_model.dart';
 import 'package:academic_planner_fe/features/term/data/term_model.dart';
 import 'package:academic_planner_fe/features/term/provider/term_detail_provider.dart';
+import 'package:academic_planner_fe/features/term/widgets/course_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -28,9 +28,9 @@ class _TermDetailsState extends ConsumerState<TermDetails> {
     // ✅ Listen for errors — never navigate/show snackbar in build()
     ref.listen(termDetailProvider, (prev, next) {
       if (next.error != null && next.error!.isNotEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: ${next.error}')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error: ${next.error}')));
         GoRouter.of(context).pop();
       }
     });
@@ -39,9 +39,7 @@ class _TermDetailsState extends ConsumerState<TermDetails> {
 
     // ✅ Loading before accessing term
     if (state.isLoading || state.term == null) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
     final term = state.term!;
@@ -87,6 +85,51 @@ class _TermDetailsState extends ConsumerState<TermDetails> {
         icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white),
         onPressed: () => GoRouter.of(context).pop(),
       ),
+      actions: [
+        PopupMenuButton<String>(
+          icon: Icon(Icons.more_vert, color: Colors.white),
+          onSelected: (value) {
+            if (value == "edit") {
+              showModalBottomSheet(
+                context: context,
+                builder: (BuildContext context) {
+                  return Column(children: [
+
+                  ],
+                );
+                },
+              );
+            } else if (value == 'delete') {
+              // show modal delete
+            }
+          },
+          itemBuilder: (context) => [
+            PopupMenuItem(
+              value: 'edit',
+              padding: EdgeInsets.all(20),
+              child: Row(
+                children: [
+                  Icon(Icons.edit),
+                  const SizedBox(width: 10),
+                  Text("Edit"),
+                ],
+              ),
+            ),
+            PopupMenuDivider(),
+            PopupMenuItem(
+              value: "delete",
+              padding: EdgeInsets.all(20),
+              child: Row(
+                children: [
+                  Icon(Icons.delete),
+                  const SizedBox(width: 10),
+                  Text("Delete"),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ],
       flexibleSpace: FlexibleSpaceBar(
         background: Container(
           decoration: BoxDecoration(
@@ -114,13 +157,13 @@ class _TermDetailsState extends ConsumerState<TermDetails> {
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
-                    )
+                    ),
                   ),
                   Text(
                     'Academic Year ${term.year}',
                     style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                        color: Colors.white.withOpacity(0.75)
-                    )
+                      color: Colors.white.withOpacity(0.75),
+                    ),
                   ),
                 ],
               ),
@@ -133,11 +176,11 @@ class _TermDetailsState extends ConsumerState<TermDetails> {
 
   // ─── Stat Row ────────────────────────────────────────────────────
   Widget _buildStatRow(
-      BuildContext context,
-      TermModel term,
-      GpaModel? gpa,
-      int totalCredits,
-      ) {
+    BuildContext context,
+    TermModel term,
+    GpaModel? gpa,
+    int totalCredits,
+  ) {
     return Row(
       children: [
         Expanded(
@@ -178,9 +221,7 @@ class _TermDetailsState extends ConsumerState<TermDetails> {
       decoration: BoxDecoration(
         color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.5),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: theme.colorScheme.outline.withOpacity(0.1),
-        ),
+        border: Border.all(color: theme.colorScheme.outline.withOpacity(0.1)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -207,10 +248,7 @@ class _TermDetailsState extends ConsumerState<TermDetails> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              _MiniStat(
-                label: 'Total Credits',
-                value: '${gpa.totalCredit}',
-              ),
+              _MiniStat(label: 'Total Credits', value: '${gpa.totalCredit}'),
               _MiniStat(
                 label: 'Grade Points',
                 value: '${gpa.totalGradePoints.toInt()}',
@@ -252,18 +290,18 @@ class _TermDetailsState extends ConsumerState<TermDetails> {
         ),
         term.courses.isEmpty
             ? _EmptyState(
-          icon: Icons.book_outlined,
-          message: 'No courses yet',
-          subtitle: 'Tap Add to enroll in a course',
-        )
+                icon: Icons.book_outlined,
+                message: 'No courses yet',
+                subtitle: 'Tap Add to enroll in a course',
+              )
             : ListView.separated(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          itemCount: term.courses.length,
-          separatorBuilder: (_, __) => const SizedBox(height: 10),
-          itemBuilder: (context, index) =>
-              _CourseCard(course: term.courses[index]),
-        ),
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: term.courses.length,
+                separatorBuilder: (_, __) => const SizedBox(height: 10),
+                itemBuilder: (context, index) =>
+                    CourseCard(course: term.courses[index]),
+              ),
       ],
     );
   }
@@ -304,9 +342,9 @@ class _StatusBadge extends StatelessWidget {
           const SizedBox(width: 6),
           Text(
             isComplete ? 'Completed' : 'In Progress',
-            style: Theme.of(context).textTheme.titleSmall?.copyWith(
-              color: color,
-            ),
+            style: Theme.of(
+              context,
+            ).textTheme.titleSmall?.copyWith(color: color),
           ),
         ],
       ),
@@ -336,9 +374,7 @@ class _StatCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.5),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: theme.colorScheme.outline.withOpacity(0.1),
-        ),
+        border: Border.all(color: theme.colorScheme.outline.withOpacity(0.1)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -448,135 +484,6 @@ class _MiniStat extends StatelessWidget {
   }
 }
 
-// ─── Course Card ──────────────────────────────────────────────────
-class _CourseCard extends StatelessWidget {
-  final CourseModel course;
-  const _CourseCard({required this.course});
-
-  Color _gradeColor(Grade grade) {
-    switch (grade) {
-      case Grade.A:
-        return const Color(0xFF22C55E);
-      case Grade.B_PLUS:
-      case Grade.B:
-        return const Color(0xFF3B82F6);
-      case Grade.C_PLUS:
-      case Grade.C:
-        return const Color(0xFFF59E0B);
-      default:
-        return const Color(0xFFEF4444);
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final gradeColor = _gradeColor(course.grade);
-
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.5),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: theme.colorScheme.outline.withOpacity(0.1),
-        ),
-      ),
-      child: Row(
-        children: [
-          // Icon
-          Container(
-            width: 46,
-            height: 46,
-            decoration: BoxDecoration(
-              color: theme.colorScheme.primary.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Icon(
-              Icons.menu_book_rounded,
-              color: theme.colorScheme.primary,
-              size: 20,
-            ),
-          ),
-          const SizedBox(width: 14),
-          // Info
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  course.name,
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                const SizedBox(height: 3),
-                Text(
-                  '${course.category.displayName} • ${course.credit} credits',
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.colorScheme.onSurface.withOpacity(0.5),
-                  ),
-                ),
-                const SizedBox(height: 5),
-                // Type badge
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 2,
-                  ),
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.primary.withOpacity(0.08),
-                    borderRadius: BorderRadius.circular(999),
-                  ),
-                  child: Text(
-                    course.type.displayName,
-                    style: TextStyle(
-                      fontSize: 10,
-                      fontWeight: FontWeight.w600,
-                      color: theme.colorScheme.primary,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          // Grade badge
-          Column(
-            children: [
-              Container(
-                width: 44,
-                height: 44,
-                decoration: BoxDecoration(
-                  color: gradeColor.withOpacity(0.12),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Center(
-                  child: Text(
-                    course.grade.displayName, // ✅ uses extension
-                    style: TextStyle(
-                      color: gradeColor,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 2),
-              Text(
-                '${course.gradePoint} pts',
-                style: theme.textTheme.bodySmall?.copyWith(
-                  fontSize: 10,
-                  color: theme.colorScheme.onSurface.withOpacity(0.45),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
 // ─── Empty State ──────────────────────────────────────────────────
 class _EmptyState extends StatelessWidget {
   final IconData icon;
@@ -598,9 +505,7 @@ class _EmptyState extends StatelessWidget {
       decoration: BoxDecoration(
         color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.3),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: theme.colorScheme.outline.withOpacity(0.1),
-        ),
+        border: Border.all(color: theme.colorScheme.outline.withOpacity(0.1)),
       ),
       child: Column(
         children: [

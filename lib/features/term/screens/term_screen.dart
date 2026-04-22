@@ -1,6 +1,6 @@
-import 'package:academic_planner_fe/features/auth/providers/auth_provider.dart';
 import 'package:academic_planner_fe/features/term/provider/term_provider.dart';
 import 'package:academic_planner_fe/features/term/widgets/term_card.dart';
+import 'package:academic_planner_fe/features/term/widgets/term_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -26,7 +26,8 @@ class _TermScreenState extends ConsumerState<TermScreen> {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (_) => const _AddTermSheet(),
+      builder: (_) =>
+          const TermSheet(header: "Add new term", buttonLabel: "Add Term"),
     );
   }
 
@@ -34,12 +35,12 @@ class _TermScreenState extends ConsumerState<TermScreen> {
   Widget build(BuildContext context) {
     ref.listen(termProvider, (prev, next) {
       if (next.error != "" && prev?.error != next.error) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(next.error ?? "Unknown error")),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(next.error ?? "Unknown error")));
       }
     });
-    
+
     final state = ref.watch(termProvider);
     final theme = Theme.of(context);
 
@@ -79,8 +80,9 @@ class _TermScreenState extends ConsumerState<TermScreen> {
                   padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
                   child: _SummaryBanner(
                     termCount: state.terms.length,
-                    completedCount:
-                    state.terms.where((t) => t.isComplete).length,
+                    completedCount: state.terms
+                        .where((t) => t.isComplete)
+                        .length,
                     avgGpa: _calcAvgGpa(state),
                   ),
                 ),
@@ -92,31 +94,27 @@ class _TermScreenState extends ConsumerState<TermScreen> {
                 child: Center(child: CircularProgressIndicator()),
               )
             else if (state.error != null && state.error!.isNotEmpty)
-              SliverFillRemaining(
-                child: _ErrorState(error: state.error!),
-              )
+              SliverFillRemaining(child: _ErrorState(error: state.error!))
             else if (state.terms.isEmpty)
-                const SliverFillRemaining(
-                  child: _EmptyState(),
-                )
-              else
-                SliverPadding(
-                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 100),
-                  sliver: SliverList.separated(
-                    itemCount: state.terms.length,
-                    separatorBuilder: (_, __) => const SizedBox(height: 12),
-                    itemBuilder: (context, index) {
-                      final term = state.terms[index];
-                      return TermCard(
-                        term: term,
-                        onTap: () => GoRouter.of(context).pushNamed(
-                          'term-details',
-                          pathParameters: {'termId': term.id},
-                        ),
-                      );
-                    },
-                  ),
+              const SliverFillRemaining(child: _EmptyState())
+            else
+              SliverPadding(
+                padding: const EdgeInsets.fromLTRB(20, 0, 20, 100),
+                sliver: SliverList.separated(
+                  itemCount: state.terms.length,
+                  separatorBuilder: (_, __) => const SizedBox(height: 12),
+                  itemBuilder: (context, index) {
+                    final term = state.terms[index];
+                    return TermCard(
+                      term: term,
+                      onTap: () => GoRouter.of(context).pushNamed(
+                        'term-details',
+                        pathParameters: {'termId': term.id},
+                      ),
+                    );
+                  },
                 ),
+              ),
           ],
         ),
       ),
@@ -219,16 +217,13 @@ class _BannerStat extends StatelessWidget {
         const SizedBox(height: 6),
         Text(
           value,
-          style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-            color: Colors.white
-          ),
+          style: Theme.of(
+            context,
+          ).textTheme.headlineMedium?.copyWith(color: Colors.white),
         ),
         Text(
           label,
-          style: TextStyle(
-            color: Colors.white.withOpacity(0.7),
-            fontSize: 12,
-          ),
+          style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 12),
         ),
       ],
     );
@@ -301,162 +296,14 @@ class _ErrorState extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(Icons.error_outline,
-              size: 48, color: Theme.of(context).colorScheme.error),
+          Icon(
+            Icons.error_outline,
+            size: 48,
+            color: Theme.of(context).colorScheme.error,
+          ),
           const SizedBox(height: 12),
           Text(error, textAlign: TextAlign.center),
         ],
-      ),
-    );
-  }
-}
-
-// ─── Add Term Bottom Sheet ────────────────────────────────────────
-class _AddTermSheet extends ConsumerStatefulWidget {
-  const _AddTermSheet();
-
-  @override
-  ConsumerState<_AddTermSheet> createState() => _AddTermSheetState();
-}
-
-class _AddTermSheetState extends ConsumerState<_AddTermSheet> {
-  final _formKey = GlobalKey<FormState>();
-  final _nameController = TextEditingController();
-  final _yearController = TextEditingController();
-  int _selectedTermNo = 1;
-  bool _isComplete = false;
-
-  @override
-  void dispose() {
-    _nameController.dispose();
-    _yearController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isLoading = ref.watch(termProvider).isLoading;
-    final userId = ref.watch(authProvider).user?.id;
-
-    return SingleChildScrollView(
-      child: Container(
-        padding: EdgeInsets.fromLTRB(
-          24, 24, 24,
-          MediaQuery.of(context).viewInsets.bottom + 24,
-        ),
-        decoration: BoxDecoration(
-          color: theme.colorScheme.surface,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
-        ),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Center(
-                child: Container(
-                  width: 40,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.outline.withOpacity(0.3),
-                    borderRadius: BorderRadius.circular(999),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 20),
-              Text("Add new Term"),
-              const SizedBox(height: 20,),
-              TextFormField(
-                controller: _nameController,
-                decoration: InputDecoration(
-                  labelText: "Term Name",
-                  hintText: "eg First Semester of ${DateTime.now().year.toString()}",
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  prefix: const Icon(Icons.edit_outlined),
-                ),
-                validator: (v) => v == null || v.isEmpty ? "Name is required" : null,
-              ),
-              const SizedBox(height: 20,),
-              Row(
-                children: [
-                  Expanded(
-                    child: TextFormField(
-                      controller: _yearController,
-                      decoration: InputDecoration(
-                        labelText: "Term year",
-                        hintText: "eg ${DateTime.now().year.toString()}",
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12)
-                        ),
-                        prefix: const Icon(Icons.calendar_month),
-                      ),
-                      validator: (v) {
-                        if (v == null || v.isEmpty) return "Year is required";
-                        if (int.tryParse(v) == null || int.parse(v) < 1) return "Please enter a valid year";
-                        return null; // Change "" to null
-                      },
-                    ),
-                  ),
-                  const SizedBox(width: 12,),
-                  Expanded(
-                    child: DropdownButtonFormField(
-                      value: _selectedTermNo,
-                      items: [1,2,3,4,5,6,7,8,9,10].map((t) => DropdownMenuItem(
-                        value: t,
-                        child: Text('Term $t'),
-                      )).toList(),
-                      decoration: InputDecoration(
-                        labelText: "Semester No.",
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12)
-                        )
-                      ), onChanged: (int? value) {
-                        setState(() {
-                          _selectedTermNo = value!;
-                        });
-                    },
-                    ),
-                  )
-                ],
-              ),
-              SwitchListTile(
-                value: _isComplete,
-                onChanged: (v) => setState(() => _isComplete = v),
-                title: const Text('Mark as Completed'),
-                contentPadding: EdgeInsets.zero,
-              ),
-              const SizedBox(height: 20),
-              SizedBox(
-                width: double.infinity,
-                child: FilledButton(onPressed: isLoading ? null : () async {
-                  if (!_formKey.currentState!.validate()) return;
-                  await ref.read(termProvider.notifier).addTerm(term: _nameController.text, termNo: _selectedTermNo, isComplete: _isComplete, userId: userId ?? "", year: int.parse(_yearController.text));
-                  GoRouter.of(context).pop();
-                },
-                  style: FilledButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadiusGeometry.circular(12)
-                    )
-                  ),
-                  child: isLoading ? const SizedBox(
-                    height: 20,
-                    width: 20,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: Colors.white,
-                    ),
-                  )
-                  : const Text("Add Term")
-                ),
-              )
-            ],
-          ),
-        ),
       ),
     );
   }

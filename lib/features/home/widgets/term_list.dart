@@ -39,7 +39,7 @@ class _TermListState extends ConsumerState<TermList> {
                   pathParameters: {'termId': term.id},
                 ),
               ),
-              SizedBox(height: 10,)
+              SizedBox(height: 10),
             ],
           );
         }),

@@ -1,16 +1,16 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
-class ApiService {
+class AuthApiService {
   final FlutterSecureStorage _storage = const FlutterSecureStorage();
   final String? Function() getAccessToken;
   late final Dio _dio;
   late final Dio _refreshDio;
 
-  ApiService({required this.getAccessToken}) {
+  AuthApiService({required this.getAccessToken}) {
     _dio = Dio(
       BaseOptions(
-        baseUrl: "http://192.168.1.33:8080/api/v1",
+        baseUrl: "https://academic-planner-backend-vfbf.onrender.com/api/v1",
         headers: {'Content-Type': 'application/json'},
         connectTimeout: const Duration(seconds: 15),
         receiveTimeout: const Duration(seconds: 15),
@@ -19,7 +19,7 @@ class ApiService {
 
     _refreshDio = Dio(
       BaseOptions(
-        baseUrl: "http://192.168.1.33:8080/api/v1",
+        baseUrl: "https://academic-planner-backend-vfbf.onrender.com/api/v1",
         headers: {'Content-Type': 'application/json'},
       ),
     );
@@ -36,15 +36,12 @@ class ApiService {
         }
         handler.next(options);
       },
-
       onError: (error, handler) async {
         if (error.response?.statusCode == 401) {
           try {
-            final storedRefreshToken = await _storage.read(
-              key: 'refresh_token',
-            );
+            final storedRefreshToken = await _storage.read(key: 'refresh_token');
             if (storedRefreshToken == null) {
-              await _onRefreshFailed();
+              await _storage.deleteAll();
               return;
             }
 
@@ -65,7 +62,7 @@ class ApiService {
             final retried = await _dio.fetch(opts);
             return handler.resolve(retried);
           } catch (e) {
-            await _onRefreshFailed();
+            await _storage.deleteAll();
           }
         }
         handler.next(error);
@@ -73,11 +70,7 @@ class ApiService {
     );
   }
 
-  Future<void> _onRefreshFailed() async {
-    await _storage.deleteAll();
-  }
-
-  Future<Map<String, dynamic>> signInAccount({
+  Future<Map<String, dynamic>> signIn({
     required String email,
     required String password,
   }) async {
@@ -92,7 +85,7 @@ class ApiService {
     }
   }
 
-  Future<Map<String, dynamic>> createAccount({
+  Future<Map<String, dynamic>> signUp({
     required String name,
     required String email,
     required String password,
@@ -117,48 +110,6 @@ class ApiService {
       return response.data;
     } on DioException catch (e) {
       throw Exception(e.response?.data['message'] ?? 'Something went wrong');
-    }
-  }
-
-  Future<Map<String, dynamic>> createTerm({
-    required String term,
-    required int year,
-    required int termNo,
-    required bool isComplete,
-    required String userId,
-  }) async {
-    try {
-      final response = await _dio.post(
-        '/semesters/addSemester',
-        data: {
-          'term': term,
-          'year': year,
-          'term_no': termNo,
-          'is_complete': isComplete,
-          'user_id': userId,
-        },
-      );
-      return response.data;
-    } on DioException catch (e) {
-      throw Exception(e.response?.data['message'] ?? 'Something went wrong');
-    }
-  }
-
-  Future<Map<String, dynamic>> findTermsByUserId() async {
-    try {
-      final response = await _dio.get('/semesters/getSemesters');
-      return response.data;
-    } on DioException catch (e) {
-      throw Exception(e.response?.data['message'] ?? 'Something went wrong');
-    }
-  }
-
-  Future<Map<String, dynamic>> findTermById(String termId) async {
-    try {
-      final response = await _dio.get('/semesters/getSemesterById/$termId');
-      return response.data;
-    } on DioException catch(e) {
-      throw Exception(e.response?.data['message'] ?? "Something went wrong");
     }
   }
 }
