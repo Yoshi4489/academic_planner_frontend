@@ -1,7 +1,9 @@
 import 'package:academic_planner_fe/features/term/data/gpa_model.dart';
 import 'package:academic_planner_fe/features/term/data/term_model.dart';
 import 'package:academic_planner_fe/features/term/provider/term_detail_provider.dart';
+import 'package:academic_planner_fe/features/term/provider/term_provider.dart';
 import 'package:academic_planner_fe/features/term/widgets/course_card.dart';
+import 'package:academic_planner_fe/features/term/widgets/term_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -23,11 +25,105 @@ class _TermDetailsState extends ConsumerState<TermDetails> {
     });
   }
 
+  void _showEditTermSheet(TermModel term) {
+    showModalBottomSheet(context: context, builder: (BuildContext context) {
+      return TermSheet(header: 'Edit Term', buttonLabel: 'Edit Term',
+        termId: widget.termId,
+        name: term.term,
+        year: term.year.toString(),
+        termNo: term.termNo,
+        isComplete: term.isComplete,
+      );
+    });
+  }
+
+  void _showDeleteTermModal() {
+    showDialog(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.redAccent.shade200.withOpacity(0.15),
+                  borderRadius: BorderRadius.circular(999),
+                ),
+                child: const Icon(Icons.warning_rounded, color: Colors.red, size: 36),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                "Delete Term",
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                "Are you sure you want to delete this term?",
+                style: Theme.of(context).textTheme.bodyMedium,
+                textAlign: TextAlign.center,
+              ),
+              Text(
+                "This action cannot be undone.",
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.red),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 24),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: Text("Cancel", style: TextStyle(color: Theme.of(context).colorScheme.tertiary),),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: FilledButton(
+                      onPressed: () async {
+                        Navigator.of(dialogContext).pop();
+
+                        await ref.read(termDetailProvider.notifier).removeTerm(
+                          termId: widget.termId,
+                        );
+
+                        ref.read(termProvider.notifier).removeTerm(widget.termId);
+
+                        GoRouter.of(context).pop();
+                      },
+                      style: FilledButton.styleFrom(
+                        backgroundColor: Colors.red,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: Text("Delete", style: TextStyle(color: Colors.white)),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     // ✅ Listen for errors — never navigate/show snackbar in build()
     ref.listen(termDetailProvider, (prev, next) {
-      if (next.error != null && next.error!.isNotEmpty) {
+      if (next.error != prev?.error && next.error!.isNotEmpty) {
         ScaffoldMessenger.of(
           context,
         ).showSnackBar(SnackBar(content: Text('Error: ${next.error}')));
@@ -90,17 +186,9 @@ class _TermDetailsState extends ConsumerState<TermDetails> {
           icon: Icon(Icons.more_vert, color: Colors.white),
           onSelected: (value) {
             if (value == "edit") {
-              showModalBottomSheet(
-                context: context,
-                builder: (BuildContext context) {
-                  return Column(children: [
-
-                  ],
-                );
-                },
-              );
+              _showEditTermSheet(term);
             } else if (value == 'delete') {
-              // show modal delete
+              _showDeleteTermModal();
             }
           },
           itemBuilder: (context) => [

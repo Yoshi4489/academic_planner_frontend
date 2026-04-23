@@ -60,7 +60,6 @@ class _TermSheetState extends ConsumerState<TermSheet> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isLoading = ref.watch(termProvider).isLoading;
-    final userId = ref.watch(authProvider).user?.id;
 
     return SingleChildScrollView(
       child: Container(
@@ -172,6 +171,7 @@ class _TermSheetState extends ConsumerState<TermSheet> {
                       : () async {
                           if (!_formKey.currentState!.validate()) return;
                           if (widget.isEditing) {
+                            print("Term id: ${widget.termId}");
                             await ref
                                 .read(termDetailProvider.notifier)
                                 .editTerm(

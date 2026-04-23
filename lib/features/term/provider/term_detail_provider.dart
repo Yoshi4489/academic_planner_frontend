@@ -67,6 +67,20 @@ class TermDetailProvider extends StateNotifier<TermDetailsState> {
       );
     }
   }
+
+  Future<void> removeTerm({required String termId}) async {
+    if (state.isLoading) return;
+    try {
+      state = state.copyWith(isLoading: true, error: "");
+      final response = await _apiService.deleteTerm(termId: termId);
+      state = state.copyWith(isLoading: false);
+    } on Exception catch (e) {
+      state = state.copyWith(
+        isLoading: false,
+        error: e.toString().replaceFirst("Exception: ", ""),
+      );
+    }
+  }
 }
 
 final termDetailProvider =

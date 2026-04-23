@@ -82,6 +82,15 @@ class TermApiService {
     }
   }
 
+  Future<Map<String, dynamic>> deleteTerm({required String termId}) async {
+    try {
+      final response = await _dio.delete("/semesters/deleteSemester/$termId");
+      return response.data;
+    } on DioException catch (e) {
+      throw Exception(e.response?.data['message'] ?? "Something went wrong");
+    }
+  }
+
   Future<Map<String, dynamic>> findTermsByUserId() async {
     try {
       final response = await _dio.get('/semesters/getSemesters');

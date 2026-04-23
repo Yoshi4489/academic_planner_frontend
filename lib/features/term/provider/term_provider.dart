@@ -61,6 +61,14 @@ class TermController extends StateNotifier<TermState> {
     }
   }
 
+  Future<void> removeTerm(String termId) async{
+    final terms = state.terms.where(
+        (t) => t.id != termId
+    ).toList();
+
+    state = state.copyWith(terms: terms);
+  }
+
   Future<void> getTemrsByUserId() async {
     if (state.isLoading) return;
     try {
