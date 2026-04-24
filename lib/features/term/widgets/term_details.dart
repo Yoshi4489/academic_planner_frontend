@@ -3,6 +3,7 @@ import 'package:academic_planner_fe/features/term/data/term_model.dart';
 import 'package:academic_planner_fe/features/term/provider/term_detail_provider.dart';
 import 'package:academic_planner_fe/features/term/provider/term_provider.dart';
 import 'package:academic_planner_fe/features/term/widgets/course_card.dart';
+import 'package:academic_planner_fe/features/term/widgets/course_sheet.dart';
 import 'package:academic_planner_fe/features/term/widgets/term_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -117,6 +118,12 @@ class _TermDetailsState extends ConsumerState<TermDetails> {
         );
       },
     );
+  }
+
+  void _showAddCourseModalBottomSheet() {
+    showModalBottomSheet(context: context, builder: (BuildContext dialogContext) {
+      return CourseSheet(header: "Create Course", buttonLabel: "Create Course", termId: widget.termId,);
+    });
   }
 
   @override
@@ -364,9 +371,11 @@ class _TermDetailsState extends ConsumerState<TermDetails> {
             ),
             const Spacer(),
             FilledButton.icon(
-              onPressed: () {},
-              icon: const Icon(Icons.add, size: 16),
-              label: const Text('Add'),
+              onPressed: () {
+                _showAddCourseModalBottomSheet();
+              },
+              icon: const Icon(Icons.add, size: 16, color: Colors.white,),
+              label: const Text('Add', style: TextStyle(color: Colors.white),),
               style: FilledButton.styleFrom(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 16,
