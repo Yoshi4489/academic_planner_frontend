@@ -25,13 +25,15 @@ class _GPASummaryCardState extends ConsumerState<GPASummaryCard> {
   double _calcAvgGpa(TermState state) {
     if (state.terms.isEmpty) return 0.0;
 
-    state.terms.sort((a, b) {
+    final termWithGpa = state.terms.where((t) => t.gpas.isNotEmpty).toList();
+
+    termWithGpa.sort((a, b) {
       final yearComparison = a.year.compareTo(b.year);
       if (yearComparison != 0) return yearComparison;
       return a.termNo.compareTo(b.termNo);
     });
 
-    return state.terms.last.gpas.last.cumGpa;
+    return termWithGpa.last.gpas.last.cumGpa;
   }
 
   int _calTotalCredits(TermState state) {
@@ -39,6 +41,7 @@ class _GPASummaryCardState extends ConsumerState<GPASummaryCard> {
     if (state.terms.isEmpty) return totalCredits;
 
     for (var t in state.terms) {
+      if (t.gpas.isEmpty) continue;
       totalCredits += t.gpas[0].totalCredit;
     }
     return totalCredits;

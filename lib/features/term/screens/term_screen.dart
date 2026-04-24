@@ -121,8 +121,8 @@ class _TermScreenState extends ConsumerState<TermScreen> {
       // ✅ FAB as second entry point
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _showAddTermSheet,
-        icon: const Icon(Icons.add),
-        label: const Text('Add Term'),
+        icon: const Icon(Icons.add, color: Colors.white),
+        label: const Text('Add Term', style: TextStyle(color: Colors.white)),
       ),
     );
   }

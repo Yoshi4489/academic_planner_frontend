@@ -208,7 +208,7 @@ class _TermSheetState extends ConsumerState<TermSheet> {
                             color: Colors.white,
                           ),
                         )
-                      : Text(widget.buttonLabel),
+                      : Text(widget.buttonLabel, style: const TextStyle(color: Colors.white),),
                 ),
               ),
             ],
