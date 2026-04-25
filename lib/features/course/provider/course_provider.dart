@@ -1,6 +1,6 @@
 import 'package:academic_planner_fe/core/providers/api_providers.dart';
 import 'package:academic_planner_fe/core/services/course_api_service.dart';
-import 'package:academic_planner_fe/features/term/data/course_model.dart';
+import 'package:academic_planner_fe/features/course/data/course_model.dart';
 import 'package:flutter_riverpod/legacy.dart';
 
 const _courseSentinel = Object();

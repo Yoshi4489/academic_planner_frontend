@@ -3,7 +3,7 @@ import 'package:academic_planner_fe/features/term/provider/term_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:academic_planner_fe/features/term/provider/course_provider.dart';
+import 'package:academic_planner_fe/features/course/provider/course_provider.dart';
 
 class CourseSheet extends ConsumerStatefulWidget {
   final String header;

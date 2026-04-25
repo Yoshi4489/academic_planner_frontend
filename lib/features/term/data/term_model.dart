@@ -1,4 +1,4 @@
-import 'package:academic_planner_fe/features/term/data/course_model.dart';
+import 'package:academic_planner_fe/features/course/data/course_model.dart';
 import 'package:academic_planner_fe/features/term/data/gpa_model.dart';
 
 class TermModel {

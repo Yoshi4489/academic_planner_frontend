@@ -2,22 +2,22 @@ import 'package:academic_planner_fe/features/term/data/gpa_model.dart';
 import 'package:academic_planner_fe/features/term/data/term_model.dart';
 import 'package:academic_planner_fe/features/term/provider/term_detail_provider.dart';
 import 'package:academic_planner_fe/features/term/provider/term_provider.dart';
-import 'package:academic_planner_fe/features/term/widgets/course_card.dart';
-import 'package:academic_planner_fe/features/term/widgets/course_sheet.dart';
+import 'package:academic_planner_fe/features/course/widgets/course_card.dart';
+import 'package:academic_planner_fe/features/course/widgets/course_sheet.dart';
 import 'package:academic_planner_fe/features/term/widgets/term_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-class TermDetails extends ConsumerStatefulWidget {
+class TermDetailsScreen extends ConsumerStatefulWidget {
   final String termId;
-  const TermDetails({super.key, required this.termId});
+  const TermDetailsScreen({super.key, required this.termId});
 
   @override
-  ConsumerState<TermDetails> createState() => _TermDetailsState();
+  ConsumerState<TermDetailsScreen> createState() => _TermDetailsScreenState();
 }
 
-class _TermDetailsState extends ConsumerState<TermDetails> {
+class _TermDetailsScreenState extends ConsumerState<TermDetailsScreen> {
   @override
   void initState() {
     super.initState();
