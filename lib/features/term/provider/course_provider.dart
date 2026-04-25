@@ -59,8 +59,33 @@ class CourseController extends StateNotifier<CourseState> {
       state = state.copyWith(isLoading: false);
     }
   }
+
+  Future<void> editCourse({
+    required String courseId,
+    String? name,
+    String? grade,
+    int? credit,
+    String? type,
+    String? category,
+}) async{
+    if (state.isLoading) return;
+    try {
+      state = state.copyWith(isLoading: false, error: "");
+      final response = await _apiService.updateCourse(courseId: courseId);
+      final course = CourseModel.fromJson(response['course']);
+      // will perfome this in course detail later
+    }
+        on Exception catch(e) {
+      state = state.copyWith(
+        isLoading: false,
+        error: e.toString().replaceFirst("Exception: ", "")
+      );
+        }
+  }
 }
 
-final courseProvider = StateNotifierProvider<CourseController, CourseState>((ref) {
+final courseProvider = StateNotifierProvider<CourseController, CourseState>((
+  ref,
+) {
   return CourseController(ref.read(courseApiServiceProvider));
 });

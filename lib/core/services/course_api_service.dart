@@ -62,4 +62,31 @@ class CourseApiService {
       throw Exception(e.response?.data['message'] ?? "Something went wrong");
     }
   }
+
+  Future<Map<String, dynamic>> updateCourse({
+    required String courseId,
+    String? name,
+    String? grade,
+    int? credit,
+    String? type,
+    String? category,
+  }) async {
+    try {
+      final data = {
+        if (name != null) "name": name,
+        if (grade != null) "grade": grade,
+        if (credit != null) "credit": credit,
+        if (type != null) "type": type,
+        if (category != null) "category": category,
+      };
+      final response = await _dio.patch(
+        "/courses/editCourse/$courseId",
+        data: data,
+      );
+
+      return response.data;
+    } on DioException catch (e) {
+      throw Exception(e.response?.data['message'] ?? "Something went wrong");
+    }
+  }
 }
