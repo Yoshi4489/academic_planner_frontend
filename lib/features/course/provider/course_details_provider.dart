@@ -38,7 +38,14 @@ class CourseDetailsController extends StateNotifier<CourseDetailState> {
     if (state.isLoading) return;
     try {
       state = state.copyWith(isLoading: false, error: "");
-      final response = await _apiService.updateCourse(courseId: courseId);
+      final response = await _apiService.updateCourse(
+        courseId: courseId,
+        name: name,
+        grade: grade,
+        credit: credit,
+        type: type,
+        category: category,
+      );
       final course = CourseModel.fromJson(response['course']);
       state = state.copyWith(course: course, isLoading: false, error: "");
     } on Exception catch (e) {

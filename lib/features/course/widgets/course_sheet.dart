@@ -1,3 +1,4 @@
+import 'package:academic_planner_fe/features/course/provider/course_details_provider.dart';
 import 'package:academic_planner_fe/features/term/provider/term_detail_provider.dart';
 import 'package:academic_planner_fe/features/term/provider/term_provider.dart';
 import 'package:flutter/material.dart';
@@ -75,6 +76,26 @@ class _CourseSheetState extends ConsumerState<CourseSheet> {
 
   String _categoryLabel(String c) => c.replaceAll('_', ' ');
 
+  // Add this helper
+  String? _normalizeGrade(String? grade) {
+    const map = {
+      'A': 'A',
+      'B+': 'B_PLUS',
+      'B': 'B',
+      'C+': 'C_PLUS',
+      'C': 'C',
+      'D+': 'D_PLUS',
+      'D': 'D',
+      'F': 'F',
+    };
+    return grade == null ? null : (map[grade] ?? grade);
+  }
+
+  String? _normalizeCategory(String? category) {
+    if (category == null) return null;
+    return category.replaceAll(' ', '_');
+  }
+
   @override
   void initState() {
     super.initState();
@@ -82,9 +103,9 @@ class _CourseSheetState extends ConsumerState<CourseSheet> {
     _creditController = TextEditingController(
       text: widget.credit?.toString() ?? "",
     );
-    _selectedGrade = widget.grade;
-    _selectedType = widget.type;
-    _selectedCategory = widget.category;
+    _selectedGrade = _normalizeGrade(widget.grade);
+    _selectedCategory = _normalizeCategory(widget.category);
+    _selectedType = widget.type?.toUpperCase();
   }
 
   @override
@@ -97,19 +118,28 @@ class _CourseSheetState extends ConsumerState<CourseSheet> {
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
 
-    final notifier = ref.read(courseProvider.notifier);
-
     if (widget.isEditing) {
-      // edit here
+      await ref
+          .read(courseDetailsProvider.notifier)
+          .editCourse(
+            courseId: widget.courseId ?? "",
+            name: _nameController.text,
+            credit: int.parse(_creditController.text),
+            grade: _selectedGrade,
+            type: _selectedType,
+            category: _selectedCategory,
+          );
     } else {
-      await notifier.addCourse(
-        semesterId: widget.termId,
-        name: _nameController.text,
-        credit: int.parse(_creditController.text),
-        grade: _selectedGrade!,
-        type: _selectedType!,
-        category: _selectedCategory!,
-      );
+      await ref
+          .read(courseProvider.notifier)
+          .addCourse(
+            semesterId: widget.termId,
+            name: _nameController.text,
+            credit: int.parse(_creditController.text),
+            grade: _selectedGrade!,
+            type: _selectedType!,
+            category: _selectedCategory!,
+          );
     }
 
     await ref.read(termProvider.notifier).getTemrsByUserId();
