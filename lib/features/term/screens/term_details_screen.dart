@@ -27,15 +27,20 @@ class _TermDetailsScreenState extends ConsumerState<TermDetailsScreen> {
   }
 
   void _showEditTermSheet(TermModel term) {
-    showModalBottomSheet(context: context, builder: (BuildContext context) {
-      return TermSheet(header: 'Edit Term', buttonLabel: 'Edit Term',
-        termId: widget.termId,
-        name: term.term,
-        year: term.year.toString(),
-        termNo: term.termNo,
-        isComplete: term.isComplete,
-      );
-    });
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return TermSheet(
+          header: 'Edit Term',
+          buttonLabel: 'Edit Term',
+          termId: widget.termId,
+          name: term.term,
+          year: term.year.toString(),
+          termNo: term.termNo,
+          isComplete: term.isComplete,
+        );
+      },
+    );
   }
 
   void _showDeleteTermModal() {
@@ -43,7 +48,9 @@ class _TermDetailsScreenState extends ConsumerState<TermDetailsScreen> {
       context: context,
       builder: (BuildContext dialogContext) {
         return AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -54,12 +61,18 @@ class _TermDetailsScreenState extends ConsumerState<TermDetailsScreen> {
                   color: Colors.redAccent.shade200.withOpacity(0.15),
                   borderRadius: BorderRadius.circular(999),
                 ),
-                child: const Icon(Icons.warning_rounded, color: Colors.red, size: 36),
+                child: const Icon(
+                  Icons.warning_rounded,
+                  color: Colors.red,
+                  size: 36,
+                ),
               ),
               const SizedBox(height: 16),
               Text(
                 "Delete Term",
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                style: Theme.of(
+                  context,
+                ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
               Text(
@@ -69,7 +82,9 @@ class _TermDetailsScreenState extends ConsumerState<TermDetailsScreen> {
               ),
               Text(
                 "This action cannot be undone.",
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.red),
+                style: Theme.of(
+                  context,
+                ).textTheme.bodyMedium?.copyWith(color: Colors.red),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 24),
@@ -84,7 +99,12 @@ class _TermDetailsScreenState extends ConsumerState<TermDetailsScreen> {
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
-                      child: Text("Cancel", style: TextStyle(color: Theme.of(context).colorScheme.tertiary),),
+                      child: Text(
+                        "Cancel",
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.tertiary,
+                        ),
+                      ),
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -93,11 +113,13 @@ class _TermDetailsScreenState extends ConsumerState<TermDetailsScreen> {
                       onPressed: () async {
                         Navigator.of(dialogContext).pop();
 
-                        await ref.read(termDetailProvider.notifier).removeTerm(
-                          termId: widget.termId,
-                        );
+                        await ref
+                            .read(termDetailProvider.notifier)
+                            .removeTerm(termId: widget.termId);
 
-                        ref.read(termProvider.notifier).removeTerm(widget.termId);
+                        ref
+                            .read(termProvider.notifier)
+                            .removeTerm(widget.termId);
 
                         GoRouter.of(context).pop();
                       },
@@ -108,7 +130,10 @@ class _TermDetailsScreenState extends ConsumerState<TermDetailsScreen> {
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
-                      child: Text("Delete", style: TextStyle(color: Colors.white)),
+                      child: Text(
+                        "Delete",
+                        style: TextStyle(color: Colors.white),
+                      ),
                     ),
                   ),
                 ],
@@ -121,9 +146,16 @@ class _TermDetailsScreenState extends ConsumerState<TermDetailsScreen> {
   }
 
   void _showAddCourseModalBottomSheet() {
-    showModalBottomSheet(context: context, builder: (BuildContext dialogContext) {
-      return CourseSheet(header: "Create Course", buttonLabel: "Create Course", termId: widget.termId,);
-    });
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        return CourseSheet(
+          header: "Create Course",
+          buttonLabel: "Create Course",
+          termId: widget.termId,
+        );
+      },
+    );
   }
 
   @override
@@ -374,8 +406,8 @@ class _TermDetailsScreenState extends ConsumerState<TermDetailsScreen> {
               onPressed: () {
                 _showAddCourseModalBottomSheet();
               },
-              icon: const Icon(Icons.add, size: 16, color: Colors.white,),
-              label: const Text('Add', style: TextStyle(color: Colors.white),),
+              icon: const Icon(Icons.add, size: 16, color: Colors.white),
+              label: const Text('Add', style: TextStyle(color: Colors.white)),
               style: FilledButton.styleFrom(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 16,
@@ -396,8 +428,15 @@ class _TermDetailsScreenState extends ConsumerState<TermDetailsScreen> {
                 physics: const NeverScrollableScrollPhysics(),
                 itemCount: term.courses.length,
                 separatorBuilder: (_, __) => const SizedBox(height: 10),
-                itemBuilder: (context, index) =>
-                    CourseCard(course: term.courses[index]),
+                itemBuilder: (context, index) => GestureDetector(
+                  onTap: () {
+                    GoRouter.of(context).pushNamed(
+                      "course-details",
+                      pathParameters: {"courseId": term.courses[index].id},
+                    );
+                  },
+                  child: CourseCard(course: term.courses[index]),
+                ),
               ),
       ],
     );

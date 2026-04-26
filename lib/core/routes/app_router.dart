@@ -1,6 +1,7 @@
 import 'package:academic_planner_fe/core/widgets/scaffold_with_bottom_navigation.dart';
 import 'package:academic_planner_fe/features/auth/providers/auth_provider.dart';
 import 'package:academic_planner_fe/features/auth/screens/sign_up_screen.dart';
+import 'package:academic_planner_fe/features/course/screens/course_details_screen.dart';
 import 'package:academic_planner_fe/features/goal/screen/goal_screen.dart';
 import 'package:academic_planner_fe/features/home/screens/home_screen.dart';
 import 'package:academic_planner_fe/features/auth/screens/sign_in_screen.dart';
@@ -55,14 +56,22 @@ final router = GoRouter(
       builder: (context, data) {
         final termId = data.pathParameters['termId'] ?? "";
         return TermDetailsScreen(termId: termId);
-      }
+      },
+    ),
+    GoRoute(
+      path: "/course/:courseId",
+      name: "course-details",
+      builder: (context, data) {
+        final courseId = data.pathParameters['courseId'] ?? "";
+        return CourseDetailsScreen(courseId: courseId);
+      },
     ),
     GoRoute(
       path: "/goals",
       name: "goals",
       builder: (context, data) {
         return ScaffoldWithBottomNav(child: GoalScreen());
-      }
-    )
+      },
+    ),
   ],
 );
