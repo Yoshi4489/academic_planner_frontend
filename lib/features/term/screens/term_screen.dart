@@ -1,3 +1,5 @@
+import 'package:academic_planner_fe/core/widgets/banner_divider.dart';
+import 'package:academic_planner_fe/core/widgets/banner_state.dart';
 import 'package:academic_planner_fe/features/term/provider/term_provider.dart';
 import 'package:academic_planner_fe/features/term/widgets/term_card.dart';
 import 'package:academic_planner_fe/features/term/widgets/term_sheet.dart';
@@ -58,9 +60,7 @@ class _TermScreenState extends ConsumerState<TermScreen> {
                   children: [
                     Text(
                       'Semesters',
-                      style: theme.textTheme.headlineMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
+                      style: theme.textTheme.headlineMedium
                     ),
                     Text(
                       'Manage your academic journey term by term.',
@@ -175,68 +175,25 @@ class _SummaryBanner extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          _BannerStat(
+          BannerStat(
             label: 'Total Terms',
             value: '$termCount',
             icon: Icons.calendar_today_rounded,
           ),
-          _BannerDivider(),
-          _BannerStat(
+          BannerDivider(),
+          BannerStat(
             label: 'Completed',
             value: '$completedCount',
             icon: Icons.check_circle_outline_rounded,
           ),
-          _BannerDivider(),
-          _BannerStat(
+          BannerDivider(),
+          BannerStat(
             label: 'Avg GPA',
             value: avgGpa.toStringAsFixed(2),
             icon: Icons.stars_rounded,
           ),
         ],
       ),
-    );
-  }
-}
-
-class _BannerStat extends StatelessWidget {
-  final String label;
-  final String value;
-  final IconData icon;
-
-  const _BannerStat({
-    required this.label,
-    required this.value,
-    required this.icon,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Icon(icon, color: Colors.white.withOpacity(0.8), size: 18),
-        const SizedBox(height: 6),
-        Text(
-          value,
-          style: Theme.of(
-            context,
-          ).textTheme.headlineMedium?.copyWith(color: Colors.white),
-        ),
-        Text(
-          label,
-          style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 12),
-        ),
-      ],
-    );
-  }
-}
-
-class _BannerDivider extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: 40,
-      width: 1,
-      color: Colors.white.withOpacity(0.2),
     );
   }
 }
