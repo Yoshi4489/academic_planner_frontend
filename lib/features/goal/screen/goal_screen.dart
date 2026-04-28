@@ -1,9 +1,23 @@
 import 'package:academic_planner_fe/core/widgets/banner_divider.dart';
 import 'package:academic_planner_fe/core/widgets/banner_state.dart';
+import 'package:academic_planner_fe/features/goal/provider/goal_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class GoalScreen extends StatelessWidget {
+class GoalScreen extends ConsumerStatefulWidget {
   const GoalScreen({super.key});
+  @override
+  ConsumerState<ConsumerStatefulWidget> createState() => _GoalScreenState();
+}
+
+class _GoalScreenState extends ConsumerState<GoalScreen> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(goalProvider.notifier).getGoalsByUserId();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
