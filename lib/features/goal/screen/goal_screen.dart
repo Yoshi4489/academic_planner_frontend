@@ -44,7 +44,7 @@ class _GoalScreenState extends ConsumerState<GoalScreen> {
     final termState = ref.watch(termProvider);
     final terms = termState.terms;
     final goals = goalState.goals;
-    
+
     final termsGoal = terms
         .where((t) => goals.any((g) => g.targetSemesterId == t.id))
         .toList();

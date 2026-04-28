@@ -1,41 +1,9 @@
 import 'package:dio/dio.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class TermApiService {
-  final FlutterSecureStorage _storage = const FlutterSecureStorage();
-  final String? Function() getAccessToken;
-  late final Dio _dio;
+  final Dio _dio;
 
-  TermApiService({required this.getAccessToken}) {
-    _dio = Dio(
-      BaseOptions(
-        baseUrl: "https://academic-planner-backend-vfbf.onrender.com/api/v1",
-        headers: {'Content-Type': 'application/json'},
-        connectTimeout: const Duration(seconds: 15),
-        receiveTimeout: const Duration(seconds: 15),
-      ),
-    );
-
-    _dio.interceptors.add(_authInterceptor());
-  }
-
-  InterceptorsWrapper _authInterceptor() {
-    return InterceptorsWrapper(
-      onRequest: (options, handler) {
-        final token = getAccessToken();
-        if (token != null) {
-          options.headers['Authorization'] = 'Bearer $token';
-        }
-        handler.next(options);
-      },
-      onError: (error, handler) async {
-        if (error.response?.statusCode == 401) {
-          await _storage.deleteAll();
-        }
-        handler.next(error);
-      },
-    );
-  }
+  TermApiService(this._dio);
 
   Future<Map<String, dynamic>> createTerm({
     required String term,

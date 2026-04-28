@@ -40,6 +40,35 @@ class GoalController extends StateNotifier<GoalState> {
       );
     }
   }
+
+  Future<void> createGoal({
+    required String name,
+    required int targetGpa,
+    required String semesterId,
+    required bool isAchieved,
+  }) async {
+    if (state.isLoading) return;
+    try {
+      state = state.copyWith(isLoading: true, error: "");
+      final response = await _apiService.addGoal(
+        name: name,
+        targetGpa: targetGpa,
+        semesterId: semesterId,
+        isAchieved: isAchieved,
+      );
+      final goal = GoalModel.fromJson(response['goal']);
+      state = state.copyWith(
+        isLoading: false,
+        error: "",
+        goals: [...state.goals, goal],
+      );
+    } on Exception catch (e) {
+      state = state.copyWith(
+        isLoading: false,
+        error: e.toString().replaceFirst("Exception: ", ""),
+      );
+    }
+  }
 }
 
 final goalProvider = StateNotifierProvider<GoalController, GoalState>((ref) {

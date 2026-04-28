@@ -27,6 +27,8 @@ class AuthApiService {
     _dio.interceptors.add(_authInterceptor());
   }
 
+  Dio get authenticatedDio => _dio;
+
   InterceptorsWrapper _authInterceptor() {
     return InterceptorsWrapper(
       onRequest: (options, handler) {
@@ -39,7 +41,9 @@ class AuthApiService {
       onError: (error, handler) async {
         if (error.response?.statusCode == 401) {
           try {
-            final storedRefreshToken = await _storage.read(key: 'refresh_token');
+            final storedRefreshToken = await _storage.read(
+              key: 'refresh_token',
+            );
             if (storedRefreshToken == null) {
               await _storage.deleteAll();
               return;
