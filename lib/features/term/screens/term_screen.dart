@@ -1,5 +1,6 @@
 import 'package:academic_planner_fe/core/widgets/banner_divider.dart';
 import 'package:academic_planner_fe/core/widgets/banner_state.dart';
+import 'package:academic_planner_fe/core/widgets/error_state.dart';
 import 'package:academic_planner_fe/features/term/provider/term_provider.dart';
 import 'package:academic_planner_fe/features/term/widgets/term_card.dart';
 import 'package:academic_planner_fe/features/term/widgets/term_sheet.dart';
@@ -93,8 +94,8 @@ class _TermScreenState extends ConsumerState<TermScreen> {
               const SliverFillRemaining(
                 child: Center(child: CircularProgressIndicator()),
               )
-            else if (state.error != null && state.error!.isNotEmpty)
-              SliverFillRemaining(child: _ErrorState(error: state.error!))
+            else if (state.error != "" && state.error!.isNotEmpty)
+              SliverFillRemaining(child: ErrorState(error: state.error!))
             else if (state.terms.isEmpty)
               const SliverFillRemaining(child: _EmptyState())
             else
@@ -236,30 +237,6 @@ class _EmptyState extends StatelessWidget {
               color: theme.colorScheme.onSurface.withOpacity(0.5),
             ),
           ),
-        ],
-      ),
-    );
-  }
-}
-
-// ─── Error State ──────────────────────────────────────────────────
-class _ErrorState extends StatelessWidget {
-  final String error;
-  const _ErrorState({required this.error});
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            Icons.error_outline,
-            size: 48,
-            color: Theme.of(context).colorScheme.error,
-          ),
-          const SizedBox(height: 12),
-          Text(error, textAlign: TextAlign.center),
         ],
       ),
     );
