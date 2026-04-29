@@ -2,6 +2,7 @@ import 'package:academic_planner_fe/core/widgets/banner_divider.dart';
 import 'package:academic_planner_fe/core/widgets/banner_state.dart';
 import 'package:academic_planner_fe/core/widgets/error_state.dart';
 import 'package:academic_planner_fe/features/goal/provider/goal_provider.dart';
+import 'package:academic_planner_fe/features/goal/widgets/goal_card.dart';
 import 'package:academic_planner_fe/features/goal/widgets/goal_sheet.dart';
 import 'package:academic_planner_fe/features/term/data/term_model.dart';
 import 'package:academic_planner_fe/features/term/provider/term_provider.dart';
@@ -150,15 +151,20 @@ class _GoalScreenState extends ConsumerState<GoalScreen> {
               sliver: SliverList.separated(
                 itemCount: termsGoal.length,
                 separatorBuilder: (_, __) => const SizedBox(height: 10),
-                itemBuilder: (context, index) =>
-                    TermCard(term: termsGoal[index], onTap: () {}),
+                itemBuilder: (context, index) => GoalCard(
+                  currentGpa: termsGoal[index].gpas[0].gpa,
+                  goalName: goals[index].name,
+                  termName: termsGoal[index].term,
+                  termNo: termsGoal[index].termNo.toString(),
+                  targetGpa: goals[index].targetGpa,
+                  isAchieved: goals[index].isAchieved,
+                ),
               ),
             ),
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
-
           _showAddGoalSheet();
         },
         icon: const Icon(Icons.add, color: Colors.white),
