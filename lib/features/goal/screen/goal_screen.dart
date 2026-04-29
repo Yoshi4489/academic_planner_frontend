@@ -2,6 +2,7 @@ import 'package:academic_planner_fe/core/widgets/banner_divider.dart';
 import 'package:academic_planner_fe/core/widgets/banner_state.dart';
 import 'package:academic_planner_fe/core/widgets/error_state.dart';
 import 'package:academic_planner_fe/features/goal/provider/goal_provider.dart';
+import 'package:academic_planner_fe/features/goal/widgets/goal_sheet.dart';
 import 'package:academic_planner_fe/features/term/data/term_model.dart';
 import 'package:academic_planner_fe/features/term/provider/term_provider.dart';
 import 'package:academic_planner_fe/features/term/widgets/term_card.dart';
@@ -35,6 +36,17 @@ class _GoalScreenState extends ConsumerState<GoalScreen> {
     final lastTerm = terms.last;
     if (lastTerm.gpas.isEmpty) return 0.0;
     return lastTerm.gpas.last.cumGpa;
+  }
+
+  void _showAddGoalSheet() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (BuildContext modalContext) {
+        return GoalSheet(header: 'Create Goal', label: "Create Goal");
+      },
+    );
   }
 
   @override
@@ -131,23 +143,24 @@ class _GoalScreenState extends ConsumerState<GoalScreen> {
           else if (error != null && error.isNotEmpty)
             SliverFillRemaining(child: ErrorState(error: error))
           else if (termsGoal.isEmpty)
-              const SliverFillRemaining(child: _EmptyState())
-            else
-              SliverPadding(
-                padding: const EdgeInsets.fromLTRB(20, 0, 20, 100),
-                sliver: SliverList.separated(
-                  itemCount: termsGoal.length,
-                  separatorBuilder: (_, __) => const SizedBox(height: 10),
-                  itemBuilder: (context, index) => TermCard(
-                    term: termsGoal[index],
-                    onTap: () {},
-                  ),
-                ),
+            const SliverFillRemaining(child: _EmptyState())
+          else
+            SliverPadding(
+              padding: const EdgeInsets.fromLTRB(20, 0, 20, 100),
+              sliver: SliverList.separated(
+                itemCount: termsGoal.length,
+                separatorBuilder: (_, __) => const SizedBox(height: 10),
+                itemBuilder: (context, index) =>
+                    TermCard(term: termsGoal[index], onTap: () {}),
               ),
+            ),
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {},
+        onPressed: () {
+
+          _showAddGoalSheet();
+        },
         icon: const Icon(Icons.add, color: Colors.white),
         label: const Text('Add Goal', style: TextStyle(color: Colors.white)),
       ),

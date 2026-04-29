@@ -43,7 +43,7 @@ class GoalController extends StateNotifier<GoalState> {
 
   Future<void> createGoal({
     required String name,
-    required int targetGpa,
+    required double targetGpa,
     required String semesterId,
     required bool isAchieved,
   }) async {

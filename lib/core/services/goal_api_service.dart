@@ -16,12 +16,12 @@ class GoalApiService {
 
   Future<Map<String, dynamic>> addGoal({
     required String name,
-    required int targetGpa,
+    required double targetGpa,
     required String semesterId,
     required bool isAchieved,
   }) async {
     try {
-      final response = await _dio.get(
+      final response = await _dio.post(
         "/goals/createGoal",
         data: {
           'name': name,

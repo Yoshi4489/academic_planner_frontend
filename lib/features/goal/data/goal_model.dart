@@ -1,7 +1,7 @@
 class GoalModel {
   String id;
   String name;
-  int targetGpa;
+  double targetGpa;
   bool isAchieved;
   String targetSemesterId;
   String userId;
@@ -29,7 +29,7 @@ class GoalModel {
   GoalModel copyWith({
     String? id,
     String? name,
-    int? targetGpa,
+    double? targetGpa,
     bool? isAchieved,
     String? targetSemesterId,
     String? userId,
