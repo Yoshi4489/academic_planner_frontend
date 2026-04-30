@@ -1,3 +1,4 @@
+import 'package:academic_planner_fe/features/goal/provider/goal_details_provider.dart';
 import 'package:academic_planner_fe/features/goal/provider/goal_provider.dart';
 import 'package:academic_planner_fe/features/term/provider/term_provider.dart';
 import 'package:flutter/material.dart';
@@ -56,12 +57,19 @@ class _GoalSheetState extends ConsumerState<GoalSheet> {
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
 
-    final notifier = ref.read(goalProvider.notifier);
+    final createNotifier = ref.read(goalProvider.notifier);
+    final updateNotifier = ref.read(goalDetailsProvider.notifier);
 
     if (widget.isEditing) {
-      // update
+      await updateNotifier.editGoal(
+        goalId: widget.goalId ?? "",
+        name: _nameController.text,
+        targetGpa: double.parse(_targetGpaController.text),
+        targetSemesterId: _selectedTerm,
+        isAchieved: _isAchieved,
+      );
     } else {
-      await notifier.createGoal(
+      await createNotifier.createGoal(
         name: _nameController.text,
         targetGpa: double.parse(_targetGpaController.text),
         semesterId: _selectedTerm!,
@@ -111,7 +119,9 @@ class _GoalSheetState extends ConsumerState<GoalSheet> {
             const SizedBox(height: 20),
             Text(
               widget.header,
-              style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+              style: theme.textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
             ),
             const SizedBox(height: 20),
 
@@ -126,7 +136,10 @@ class _GoalSheetState extends ConsumerState<GoalSheet> {
                 ),
                 child: Row(
                   children: [
-                    const Icon(Icons.warning_amber_rounded, color: Colors.orange),
+                    const Icon(
+                      Icons.warning_amber_rounded,
+                      color: Colors.orange,
+                    ),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Column(
@@ -159,7 +172,9 @@ class _GoalSheetState extends ConsumerState<GoalSheet> {
                   onPressed: () => GoRouter.of(context).pop(),
                   style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                   ),
                   child: const Text("Go Back"),
                 ),
@@ -176,25 +191,34 @@ class _GoalSheetState extends ConsumerState<GoalSheet> {
                         labelText: "Name",
                         hintText: "eg. My first goal!",
                         prefixIcon: const Icon(Icons.flag_outlined),
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                       ),
-                      validator: (v) => v == null || v.isEmpty ? "Name is required" : null,
+                      validator: (v) =>
+                          v == null || v.isEmpty ? "Name is required" : null,
                     ),
                     const SizedBox(height: 16),
                     TextFormField(
                       controller: _targetGpaController,
-                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                      keyboardType: const TextInputType.numberWithOptions(
+                        decimal: true,
+                      ),
                       decoration: InputDecoration(
                         labelText: "Target GPA",
                         hintText: "eg. 3.75",
                         prefixIcon: const Icon(Icons.my_location_rounded),
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                       ),
                       validator: (v) {
-                        if (v == null || v.isEmpty) return "Target GPA is required";
+                        if (v == null || v.isEmpty)
+                          return "Target GPA is required";
                         final parsed = double.tryParse(v);
                         if (parsed == null) return "Enter a valid number";
-                        if (parsed < 0.0 || parsed > 4.0) return "GPA must be between 0.00 and 4.00";
+                        if (parsed < 0.0 || parsed > 4.0)
+                          return "GPA must be between 0.00 and 4.00";
                         return null;
                       },
                     ),
@@ -204,14 +228,22 @@ class _GoalSheetState extends ConsumerState<GoalSheet> {
                       decoration: InputDecoration(
                         labelText: "Target Semester",
                         prefixIcon: const Icon(Icons.calendar_month_outlined),
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                       ),
-                      items: terms.map((term) => DropdownMenuItem(
-                        value: term.id,
-                        child: Text(term.term),
-                      )).toList(),
-                      onChanged: (value) => setState(() => _selectedTerm = value),
-                      validator: (v) => v == null ? "Please select a semester" : null,
+                      items: terms
+                          .map(
+                            (term) => DropdownMenuItem(
+                              value: term.id,
+                              child: Text(term.term),
+                            ),
+                          )
+                          .toList(),
+                      onChanged: (value) =>
+                          setState(() => _selectedTerm = value),
+                      validator: (v) =>
+                          v == null ? "Please select a semester" : null,
                     ),
                     SwitchListTile(
                       value: _isAchieved,
@@ -226,14 +258,19 @@ class _GoalSheetState extends ConsumerState<GoalSheet> {
                         onPressed: isLoading ? null : _submit,
                         style: FilledButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 16),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
                         ),
                         child: isLoading
                             ? const SizedBox(
-                          height: 20,
-                          width: 20,
-                          child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
-                        )
+                                height: 20,
+                                width: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: Colors.white,
+                                ),
+                              )
                             : Text(widget.label),
                       ),
                     ),

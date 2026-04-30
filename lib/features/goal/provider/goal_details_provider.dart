@@ -38,6 +38,47 @@ class GoalDetailsProvider extends StateNotifier<GoalDetailsState> {
       );
     }
   }
+
+  Future<void> editGoal({
+    required String goalId,
+    String? name,
+    bool? isAchieved,
+    String? targetSemesterId,
+    double? targetGpa,
+  }) async {
+    if (state.isLoading) return;
+    try {
+      state = state.copyWith(isLoading: true, error: "");
+      final response = await _apiService.updateGoal(
+        goalId: goalId,
+        name: name,
+        isAchieved: isAchieved,
+        targetGpa: targetGpa,
+        targetSemesterId: targetSemesterId,
+      );
+      final goal = GoalModel.fromJson(response['goal']);
+      state = state.copyWith(isLoading: false, error: "", goal: goal);
+    } on Exception catch (e) {
+      state = state.copyWith(
+        isLoading: false,
+        error: e.toString().replaceFirst("Exception: ", ""),
+      );
+    }
+  }
+
+  Future<void> removeGoal({required String goalId}) async{
+    if (state.isLoading) return;
+    try {
+      state = state.copyWith(isLoading: true, error: "");
+      final response = await _apiService.deleteGoal(goalId: goalId);
+      state = state.copyWith(isLoading: false, error: "", goal: null);
+    } on Exception catch (e) {
+      state = state.copyWith(
+        isLoading: false,
+        error: e.toString().replaceFirst("Exception: ", ""),
+      );
+    }
+  }
 }
 
 final goalDetailsProvider =

@@ -109,7 +109,14 @@ class _GoalDetailScreenState extends ConsumerState<GoalDetailsScreen> {
                 Expanded(
                   child: FilledButton(
                     onPressed: () async {
-                      // perform delete
+                      Navigator.of(dialogContext).pop();
+                      await ref
+                          .read(goalDetailsProvider.notifier)
+                          .removeGoal(goalId: goal.id);
+                      await ref
+                          .read(goalProvider.notifier)
+                          .getGoalsByUserId();
+                      GoRouter.of(context).pop();
                     },
                     style: FilledButton.styleFrom(
                       backgroundColor: Colors.red,
