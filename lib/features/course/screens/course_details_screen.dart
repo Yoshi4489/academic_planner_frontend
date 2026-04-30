@@ -1,3 +1,4 @@
+import 'package:academic_planner_fe/core/widgets/stat_card.dart';
 import 'package:academic_planner_fe/features/course/data/course_model.dart';
 import 'package:academic_planner_fe/features/course/provider/course_details_provider.dart';
 import 'package:academic_planner_fe/features/course/widgets/course_sheet.dart';
@@ -304,7 +305,7 @@ class _CourseDetailsScreenState extends ConsumerState<CourseDetailsScreen> {
                   Row(
                     children: [
                       Expanded(
-                        child: _StatCard(
+                        child: StatCard(
                           icon: Icons.stars_rounded,
                           label: "Grade Point",
                           value: course.gradePoint.toStringAsFixed(2),
@@ -313,7 +314,7 @@ class _CourseDetailsScreenState extends ConsumerState<CourseDetailsScreen> {
                       ),
                       const SizedBox(width: 12),
                       Expanded(
-                        child: _StatCard(
+                        child: StatCard(
                           icon: Icons.auto_awesome_motion_rounded,
                           label: "Credits",
                           value: '${course.credit}',
@@ -322,7 +323,7 @@ class _CourseDetailsScreenState extends ConsumerState<CourseDetailsScreen> {
                       ),
                       const SizedBox(width: 12),
                       Expanded(
-                        child: _StatCard(
+                        child: StatCard(
                           icon: Icons.grade_rounded,
                           label: "Grade",
                           value: course.grade.displayName.replaceAll('_', '+'),
@@ -460,55 +461,6 @@ class _HeaderChip extends StatelessWidget {
         style: Theme.of(
           context,
         ).textTheme.titleSmall?.copyWith(color: Colors.white),
-      ),
-    );
-  }
-}
-
-// ── Stat Card — identical to term_details _StatCard ───────────────
-class _StatCard extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final String value;
-  final Color color;
-
-  const _StatCard({
-    required this.icon,
-    required this.label,
-    required this.value,
-    required this.color,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.5),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: theme.colorScheme.outline.withOpacity(0.1)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(icon, size: 18, color: color),
-          const SizedBox(height: 8),
-          Text(
-            value,
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: color,
-            ),
-          ),
-          Text(
-            label,
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: theme.colorScheme.onSurface.withOpacity(0.55),
-            ),
-          ),
-        ],
       ),
     );
   }

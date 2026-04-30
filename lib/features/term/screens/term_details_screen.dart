@@ -1,3 +1,4 @@
+import 'package:academic_planner_fe/core/widgets/stat_card.dart';
 import 'package:academic_planner_fe/features/term/data/gpa_model.dart';
 import 'package:academic_planner_fe/features/term/data/term_model.dart';
 import 'package:academic_planner_fe/features/term/provider/term_detail_provider.dart';
@@ -311,7 +312,7 @@ class _TermDetailsScreenState extends ConsumerState<TermDetailsScreen> {
     return Row(
       children: [
         Expanded(
-          child: _StatCard(
+          child: StatCard(
             icon: Icons.stars_rounded,
             label: 'GPA',
             value: gpa != null ? gpa.gpa.toStringAsFixed(2) : '—',
@@ -320,7 +321,7 @@ class _TermDetailsScreenState extends ConsumerState<TermDetailsScreen> {
         ),
         const SizedBox(width: 10),
         Expanded(
-          child: _StatCard(
+          child: StatCard(
             icon: Icons.trending_up_rounded,
             label: 'Cum GPA',
             value: gpa != null ? gpa.cumGpa.toStringAsFixed(2) : '—',
@@ -329,7 +330,7 @@ class _TermDetailsScreenState extends ConsumerState<TermDetailsScreen> {
         ),
         const SizedBox(width: 10),
         Expanded(
-          child: _StatCard(
+          child: StatCard(
             icon: Icons.workspace_premium_rounded,
             label: 'Credits',
             value: '$totalCredits',
@@ -481,55 +482,6 @@ class _StatusBadge extends StatelessWidget {
             style: Theme.of(
               context,
             ).textTheme.titleSmall?.copyWith(color: color),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// ─── Stat Card ────────────────────────────────────────────────────
-class _StatCard extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final String value;
-  final Color color;
-
-  const _StatCard({
-    required this.icon,
-    required this.label,
-    required this.value,
-    required this.color,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.5),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: theme.colorScheme.outline.withOpacity(0.1)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(icon, size: 18, color: color),
-          const SizedBox(height: 8),
-          Text(
-            value,
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: color,
-            ),
-          ),
-          Text(
-            label,
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: theme.colorScheme.onSurface.withOpacity(0.55),
-            ),
           ),
         ],
       ),
