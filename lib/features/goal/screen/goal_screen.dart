@@ -9,6 +9,7 @@ import 'package:academic_planner_fe/features/term/provider/term_provider.dart';
 import 'package:academic_planner_fe/features/term/widgets/term_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 class GoalScreen extends ConsumerStatefulWidget {
   const GoalScreen({super.key});
@@ -158,6 +159,12 @@ class _GoalScreenState extends ConsumerState<GoalScreen> {
                   termNo: termsGoal[index].termNo.toString(),
                   targetGpa: goals[index].targetGpa,
                   isAchieved: goals[index].isAchieved,
+                  onTap: () {
+                    GoRouter.of(context).pushNamed(
+                      "goal-details",
+                      pathParameters: {"goalId": goals[index].id},
+                    );
+                  },
                 ),
               ),
             ),

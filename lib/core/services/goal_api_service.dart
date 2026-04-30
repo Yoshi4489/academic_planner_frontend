@@ -36,4 +36,14 @@ class GoalApiService {
       throw Exception(e.response?.data['message'] ?? "Something went wrong");
     }
   }
+
+  Future<Map<String, dynamic>> findGoalById({required goalId}) async{
+    try {
+      final response = await _dio.get("/goals/getGoalById/$goalId");
+      return response.data;
+    }
+    on DioException catch(e) {
+      throw Exception(e.response?.data['message'] ?? "Something went wrong");
+    }
+  }
 }
