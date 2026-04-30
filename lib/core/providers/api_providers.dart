@@ -1,5 +1,6 @@
 import 'package:academic_planner_fe/core/services/auth_api_service.dart';
 import 'package:academic_planner_fe/core/services/course_api_service.dart';
+import 'package:academic_planner_fe/core/services/gpa_api_service.dart';
 import 'package:academic_planner_fe/core/services/term_api_service.dart';
 import 'package:academic_planner_fe/features/auth/providers/auth_provider.dart';
 import 'package:dio/dio.dart';
@@ -27,4 +28,8 @@ final termApiServiceProvider = Provider<TermApiService>((ref) {
 
 final goalApiServiceProvider = Provider<GoalApiService>((ref) {
   return GoalApiService(ref.read(authenticatedDioProvider));
+});
+
+final gpaApiServiceProvider = Provider<GpaApiService>((ref) {
+  return GpaApiService(ref.read(authenticatedDioProvider));
 });

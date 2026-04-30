@@ -4,6 +4,7 @@ import 'package:academic_planner_fe/features/auth/screens/sign_up_screen.dart';
 import 'package:academic_planner_fe/features/course/screens/course_details_screen.dart';
 import 'package:academic_planner_fe/features/goal/screen/goal_details_screen.dart';
 import 'package:academic_planner_fe/features/goal/screen/goal_screen.dart';
+import 'package:academic_planner_fe/features/graph/screen/graph_screen.dart';
 import 'package:academic_planner_fe/features/home/screens/home_screen.dart';
 import 'package:academic_planner_fe/features/auth/screens/sign_in_screen.dart';
 import 'package:academic_planner_fe/features/term/screens/term_screen.dart';
@@ -80,7 +81,14 @@ final router = GoRouter(
       builder: (context, data) {
         final goalId = data.pathParameters['goalId'] ?? "";
         return GoalDetailsScreen(goalId: goalId);
-      }
-    )
+      },
+    ),
+    GoRoute(
+      path: "/graph",
+      name: "graph",
+      builder: (context, data) {
+        return GraphScreen();
+      },
+    ),
   ],
 );

@@ -3,7 +3,6 @@ import 'package:academic_planner_fe/features/goal/data/goal_model.dart';
 import 'package:academic_planner_fe/features/goal/provider/goal_details_provider.dart';
 import 'package:academic_planner_fe/features/goal/provider/goal_provider.dart';
 import 'package:academic_planner_fe/features/goal/widgets/goal_sheet.dart';
-import 'package:academic_planner_fe/features/term/data/term_model.dart';
 import 'package:academic_planner_fe/features/term/provider/term_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
