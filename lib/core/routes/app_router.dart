@@ -87,7 +87,7 @@ final router = GoRouter(
       path: "/graph",
       name: "graph",
       builder: (context, data) {
-        return GraphScreen();
+        return ScaffoldWithBottomNav(child: GraphScreen());
       },
     ),
   ],
