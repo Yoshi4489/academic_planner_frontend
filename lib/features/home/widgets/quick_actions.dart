@@ -13,23 +13,23 @@ class QuickActions extends StatelessWidget {
       "route": "terms"
     },
     {
-      "label": "Course",
-      "icon": FontAwesomeIcons.bookOpen,
-      "color": Color.fromRGBO(178, 5, 255, 1),
-      "route": "home"
-    },
-    {
       "label": "Goal",
       "icon": FontAwesomeIcons.bullseye,
       "color": Color.fromRGBO(27, 228, 9, 1),
-      "route": "home"
+      "route": "goals"
     },
     {
       "label": "Graph",
       "icon": FontAwesomeIcons.chartLine,
       "color": Color.fromRGBO(255, 157, 0, 1),
-      "route": "home"
+      "route": "graph"
     },
+    {
+      "label": "Settings",
+      "icon": FontAwesomeIcons.gear,
+      "color": Colors.grey,
+      "route": "settings"
+    }
   ];
 
   @override

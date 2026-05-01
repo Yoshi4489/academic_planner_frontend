@@ -12,6 +12,7 @@ class ScaffoldWithBottomNav extends StatelessWidget {
     '/terms',
     "/goals",
     '/graph',
+    "/settings"
   ];
 
   int _getCurrentIndex(BuildContext context) {
@@ -44,6 +45,10 @@ class ScaffoldWithBottomNav extends StatelessWidget {
             icon: FaIcon(FontAwesomeIcons.chartLine),
             label: "Graph",
           ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.settings),
+            label: "Settings"
+          )
         ],
         currentIndex: _getCurrentIndex(context),
         type: BottomNavigationBarType.fixed,

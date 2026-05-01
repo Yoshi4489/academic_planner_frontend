@@ -4,6 +4,7 @@ import 'package:academic_planner_fe/core/widgets/error_state.dart';
 import 'package:academic_planner_fe/features/term/provider/term_provider.dart';
 import 'package:academic_planner_fe/features/term/widgets/term_card.dart';
 import 'package:academic_planner_fe/features/term/widgets/term_sheet.dart';
+import 'package:academic_planner_fe/features/term/widgets/term_skeleton_loading.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -59,10 +60,7 @@ class _TermScreenState extends ConsumerState<TermScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      'Semesters',
-                      style: theme.textTheme.headlineMedium
-                    ),
+                    Text('Semesters', style: theme.textTheme.headlineMedium),
                     Text(
                       'Manage your academic journey term by term.',
                       style: theme.textTheme.bodySmall?.copyWith(
@@ -91,8 +89,16 @@ class _TermScreenState extends ConsumerState<TermScreen> {
 
             // ─── Content ─────────────────────────────────────────
             if (state.isLoading)
-              const SliverFillRemaining(
-                child: Center(child: CircularProgressIndicator()),
+              SliverFillRemaining(
+                child: ListView.separated(
+                  itemCount: 5,
+                  separatorBuilder: (_, __) {
+                    return SizedBox(height: 12);
+                  },
+                  itemBuilder: (BuildContext context, int index) {
+                    return const TermSkeletonLoading();
+                  },
+                ),
               )
             else if (state.error != "" && state.error!.isNotEmpty)
               SliverFillRemaining(child: ErrorState(error: state.error!))
