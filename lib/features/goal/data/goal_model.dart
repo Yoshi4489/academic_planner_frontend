@@ -26,6 +26,17 @@ class GoalModel {
     );
   }
 
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'target_gpa': targetGpa,
+      'is_achieved': isAchieved,
+      'target_semester_id': targetSemesterId,
+      'user_id': userId,
+    };
+  }
+
   GoalModel copyWith({
     String? id,
     String? name,

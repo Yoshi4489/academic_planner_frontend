@@ -81,6 +81,20 @@ class CourseModel {
     );
   }
 
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'category': category.name,
+      'grade': grade.name,
+      'grade_point': gradePoint,
+      'credit': credit,
+      'type': type.name,
+      'created_at': createdAt,
+      'semester_id': semesterId,
+    };
+  }
+
   CourseModel copyWith({
     String? id,
     String? name,

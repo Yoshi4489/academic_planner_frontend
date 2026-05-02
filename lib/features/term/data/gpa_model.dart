@@ -29,6 +29,18 @@ class GpaModel {
     );
   }
 
+  Map<String, dynamic> toJson() {
+    return {
+      'user_id': userId,
+      'semester_id': semesterId,
+      'gpa': gpa,
+      'cum_gpa': cumGpa,
+      'total_credits': totalCredit,
+      'total_grade_points': totalGradePoints,
+      'calculated_at': calculatedAt,
+    };
+  }
+
   GpaModel copyWith({
     String? userId,
     String? semesterId,

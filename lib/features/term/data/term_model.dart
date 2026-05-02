@@ -42,6 +42,20 @@ class TermModel {
     );
   }
 
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'year': year,
+      'term': term,
+      'term_no': termNo,
+      'is_complete': isComplete,
+      'created_at': createdAt,
+      'user_id': userId,
+      'courses': courses.map((c) => c.toJson()).toList(),
+      'gpas': gpas.map((g) => g.toJson()).toList(),
+    };
+  }
+
   TermModel copyWith({
     String? id,
     int? year,
