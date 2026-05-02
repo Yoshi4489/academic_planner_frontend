@@ -82,6 +82,8 @@ class CourseDetailsController extends StateNotifier<CourseDetailState> {
       );
     }
   }
+
+  void reset() => state = CourseDetailState();
 }
 
 final courseDetailsProvider =

@@ -79,6 +79,8 @@ class GoalDetailsProvider extends StateNotifier<GoalDetailsState> {
       );
     }
   }
+
+  void reset() => state = GoalDetailsState();
 }
 
 final goalDetailsProvider =

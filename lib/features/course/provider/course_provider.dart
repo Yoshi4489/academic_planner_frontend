@@ -56,9 +56,11 @@ class CourseController extends StateNotifier<CourseState> {
         courses: [...state.courses, course],
       );
     } on Exception catch (e) {
-      state = state.copyWith(isLoading: false);
+      state = state.copyWith(isLoading: false, error: e.toString().replaceFirst("Exception: ", ""));
     }
   }
+
+  void reset() => state = CourseState();
 }
 
 final courseProvider = StateNotifierProvider<CourseController, CourseState>((

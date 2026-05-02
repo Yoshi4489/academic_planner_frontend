@@ -81,6 +81,8 @@ class TermDetailProvider extends StateNotifier<TermDetailsState> {
       );
     }
   }
+
+  void reset() => state = TermDetailsState();
 }
 
 final termDetailProvider =

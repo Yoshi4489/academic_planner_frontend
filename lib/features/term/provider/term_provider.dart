@@ -87,6 +87,8 @@ class TermController extends StateNotifier<TermState> {
       );
     }
   }
+
+  void reset() => state = TermState();
 }
 
 final termProvider = StateNotifierProvider<TermController, TermState>((ref) {

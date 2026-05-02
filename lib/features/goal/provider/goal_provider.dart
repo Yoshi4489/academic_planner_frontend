@@ -70,6 +70,8 @@ class GoalController extends StateNotifier<GoalState> {
       );
     }
   }
+
+  void reset() => state = GoalState();
 }
 
 final goalProvider = StateNotifierProvider<GoalController, GoalState>((ref) {

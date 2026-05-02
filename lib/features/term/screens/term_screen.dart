@@ -91,6 +91,7 @@ class _TermScreenState extends ConsumerState<TermScreen> {
             if (state.isLoading)
               SliverFillRemaining(
                 child: ListView.separated(
+                  padding: EdgeInsets.all(20),
                   itemCount: 5,
                   separatorBuilder: (_, __) {
                     return SizedBox(height: 12);

@@ -1,5 +1,12 @@
 import 'package:academic_planner_fe/core/services/auth_api_service.dart';
 import 'package:academic_planner_fe/features/auth/data/user_model.dart';
+import 'package:academic_planner_fe/features/course/provider/course_details_provider.dart';
+import 'package:academic_planner_fe/features/course/provider/course_provider.dart';
+import 'package:academic_planner_fe/features/goal/provider/goal_details_provider.dart';
+import 'package:academic_planner_fe/features/goal/provider/goal_provider.dart';
+import 'package:academic_planner_fe/features/term/provider/term_detail_provider.dart';
+import 'package:academic_planner_fe/features/term/provider/term_provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
@@ -31,10 +38,11 @@ class AuthState {
 }
 
 class AuthController extends StateNotifier<AuthState> {
+  final Ref _ref;
   late final AuthApiService _apiService;
   final FlutterSecureStorage _storage = const FlutterSecureStorage();
 
-  AuthController() : super(AuthState()) {
+  AuthController(this._ref) : super(AuthState()) {
     _apiService = AuthApiService(getAccessToken: () => state.accessToken);
   }
 
@@ -118,10 +126,18 @@ class AuthController extends StateNotifier<AuthState> {
 
   Future<void> logOut() async {
     await _storage.deleteAll();
+
+    _ref.read(termProvider.notifier).reset();
+    _ref.read(goalProvider.notifier).reset();
+    _ref.read(courseProvider.notifier).reset();
+    _ref.read(termDetailProvider.notifier).reset();
+    _ref.read(courseDetailsProvider.notifier).reset();
+    _ref.read(goalDetailsProvider.notifier).reset();
+
     state = AuthState();
   }
 }
 
 final authProvider = StateNotifierProvider<AuthController, AuthState>(
-  (ref) => AuthController(),
+  (ref) => AuthController(ref),
 );
