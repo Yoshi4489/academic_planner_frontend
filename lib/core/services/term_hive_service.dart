@@ -1,9 +1,12 @@
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:academic_planner_fe/features/term/data/term_model.dart';
+import 'package:academic_planner_fe/core/services/guest_mode_exceptions.dart';
 
 /// Service for managing Term data in Hive local storage
 class TermHiveService {
   static const String boxName = 'guest_terms';
+  static const int maxGuestTerms = 5;
+  
   late Box<dynamic> _box;
   bool _isInitialized = false;
 
@@ -14,8 +17,30 @@ class TermHiveService {
     _isInitialized = true;
   }
 
+  /// Check if guest mode limit is reached
+  bool isLimitReached() {
+    return _box.length >= maxGuestTerms;
+  }
+
+  /// Check if can add more terms
+  bool canAddMore() {
+    return _box.length < maxGuestTerms;
+  }
+
+  /// Get remaining slots
+  int getRemainingSlots() {
+    return maxGuestTerms - _box.length;
+  }
+
   /// Save a term to local storage
+  /// Throws [SemesterLimitException] if guest mode limit is reached
   Future<void> saveTerm(TermModel term) async {
+    if (isLimitReached()) {
+      throw SemesterLimitException(
+        currentCount: _box.length,
+        maxLimit: maxGuestTerms,
+      );
+    }
     await _box.put(term.id, term.toJson());
   }
 

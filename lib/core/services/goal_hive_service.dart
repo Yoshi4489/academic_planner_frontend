@@ -1,9 +1,12 @@
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:academic_planner_fe/features/goal/data/goal_model.dart';
+import 'package:academic_planner_fe/core/services/guest_mode_exceptions.dart';
 
 /// Service for managing Goal data in Hive local storage
 class GoalHiveService {
   static const String boxName = 'guest_goals';
+  static const int maxGuestGoals = 5;
+  
   late Box<dynamic> _box;
   bool _isInitialized = false;
 
@@ -14,8 +17,30 @@ class GoalHiveService {
     _isInitialized = true;
   }
 
+  /// Check if guest mode limit is reached
+  bool isLimitReached() {
+    return _box.length >= maxGuestGoals;
+  }
+
+  /// Check if can add more goals
+  bool canAddMore() {
+    return _box.length < maxGuestGoals;
+  }
+
+  /// Get remaining slots
+  int getRemainingSlots() {
+    return maxGuestGoals - _box.length;
+  }
+
   /// Save a goal to local storage
+  /// Throws [GoalLimitException] if guest mode limit is reached
   Future<void> saveGoal(GoalModel goal) async {
+    if (isLimitReached()) {
+      throw GoalLimitException(
+        currentCount: _box.length,
+        maxLimit: maxGuestGoals,
+      );
+    }
     await _box.put(goal.id, goal.toJson());
   }
 

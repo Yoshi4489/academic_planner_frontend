@@ -226,6 +226,59 @@ class HiveService {
     _isInitialized = false;
   }
 
+  // ==================== GUEST MODE LIMIT CHECKS ====================
+
+  /// Check if term limit is reached
+  bool isTermLimitReached() => _termService.isLimitReached();
+
+  /// Check if can add more terms
+  bool canAddMoreTerms() => _termService.canAddMore();
+
+  /// Get remaining term slots
+  int getRemainingTermSlots() => _termService.getRemainingSlots();
+
+  /// Check if goal limit is reached
+  bool isGoalLimitReached() => _goalService.isLimitReached();
+
+  /// Check if can add more goals
+  bool canAddMoreGoals() => _goalService.canAddMore();
+
+  /// Get remaining goal slots
+  int getRemainingGoalSlots() => _goalService.getRemainingSlots();
+
+  /// Check if course limit is reached
+  bool isCourseLimitReached() => _courseService.isLimitReached();
+
+  /// Check if can add more courses
+  bool canAddMoreCourses() => _courseService.canAddMore();
+
+  /// Get remaining course slots
+  int getRemainingCourseSlots() => _courseService.getRemainingSlots();
+
+  /// Get guest mode limits summary
+  Map<String, dynamic> getGuestModeLimits() {
+    return {
+      'terms': {
+        'current': _termService.getCount(),
+        'max': TermHiveService.maxGuestTerms,
+        'remaining': _termService.getRemainingSlots(),
+        'canAddMore': _termService.canAddMore(),
+      },
+      'goals': {
+        'current': _goalService.getCount(),
+        'max': GoalHiveService.maxGuestGoals,
+        'remaining': _goalService.getRemainingSlots(),
+        'canAddMore': _goalService.canAddMore(),
+      },
+      'courses': {
+        'current': _courseService.getCount(),
+        'max': CourseHiveService.maxGuestCourses,
+        'remaining': _courseService.getRemainingSlots(),
+        'canAddMore': _courseService.canAddMore(),
+      },
+    };
+  }
+
   // ==================== DIRECT SERVICE ACCESS ====================
   // For advanced use cases, you can access the specialized services directly
 
