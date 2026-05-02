@@ -29,6 +29,7 @@ class GoalController extends StateNotifier<GoalState> {
     try {
       state = state.copyWith(isLoading: false, error: "");
       final response = await _apiService.findGoalsByUserId();
+      print(response['goals']);
       final goals = (response['goals'] as List)
           .map((g) => GoalModel.fromJson(g))
           .toList();

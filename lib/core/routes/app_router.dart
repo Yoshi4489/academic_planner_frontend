@@ -7,7 +7,7 @@ import 'package:academic_planner_fe/features/goal/screen/goal_screen.dart';
 import 'package:academic_planner_fe/features/graph/screen/graph_screen.dart';
 import 'package:academic_planner_fe/features/home/screens/home_screen.dart';
 import 'package:academic_planner_fe/features/auth/screens/sign_in_screen.dart';
-import 'package:academic_planner_fe/features/setting/screens/setting_screen.dart';
+import 'package:academic_planner_fe/features/setting/screens/settings_screen.dart';
 import 'package:academic_planner_fe/features/term/screens/term_screen.dart';
 import 'package:academic_planner_fe/features/term/screens/term_details_screen.dart';
 import 'package:flutter/cupertino.dart';
@@ -95,7 +95,7 @@ final router = GoRouter(
       path: "/settings",
       name: "settings",
       builder: (context, data) {
-        return ScaffoldWithBottomNav(child: SettingScreen());
+        return ScaffoldWithBottomNav(child: SettingsScreen());
       },
     ),
   ],

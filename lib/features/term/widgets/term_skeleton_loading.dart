@@ -1,3 +1,4 @@
+import 'package:academic_planner_fe/core/widgets/skeleton_bone.dart';
 import 'package:flutter/material.dart';
 
 class TermSkeletonLoading extends StatefulWidget {
@@ -69,11 +70,11 @@ class _TermSkeletonLoadingState extends State<TermSkeletonLoading>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildSkeletonBone(width: 100, height: 8),
+                  SkeletonBone(width: 100, height: 8),
                   const SizedBox(height: 10),
-                  _buildSkeletonBone(width: 60, height: 8),
+                  SkeletonBone(width: 60, height: 8),
                   const SizedBox(height: 20),
-                  _buildSkeletonBone(width: double.infinity, height: 8),
+                  SkeletonBone(width: double.infinity, height: 8),
                 ],
               ),
             ),
@@ -81,25 +82,13 @@ class _TermSkeletonLoadingState extends State<TermSkeletonLoading>
             // The Trailing Text Lines
             Column(
               children: [
-                _buildSkeletonBone(width: 30, height: 8),
+                SkeletonBone(width: 30, height: 8),
                 const SizedBox(height: 10),
-                _buildSkeletonBone(width: 40, height: 8),
+                SkeletonBone(width: 40, height: 8),
               ],
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  // A quick helper to avoid writing the same Container 5 times
-  Widget _buildSkeletonBone({required double width, required double height}) {
-    return Container(
-      width: width,
-      height: height,
-      decoration: BoxDecoration(
-        color: Colors.grey.shade300,
-        borderRadius: BorderRadius.circular(4),
       ),
     );
   }

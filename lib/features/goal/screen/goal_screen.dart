@@ -4,6 +4,7 @@ import 'package:academic_planner_fe/core/widgets/error_state.dart';
 import 'package:academic_planner_fe/features/goal/provider/goal_provider.dart';
 import 'package:academic_planner_fe/features/goal/widgets/goal_card.dart';
 import 'package:academic_planner_fe/features/goal/widgets/goal_sheet.dart';
+import 'package:academic_planner_fe/features/goal/widgets/goal_skeleton_loading.dart';
 import 'package:academic_planner_fe/features/term/data/term_model.dart';
 import 'package:academic_planner_fe/features/term/provider/term_provider.dart';
 import 'package:academic_planner_fe/features/term/widgets/term_card.dart';
@@ -139,8 +140,17 @@ class _GoalScreenState extends ConsumerState<GoalScreen> {
 
           // ── Content ───────────────────────────────────────
           if (isLoading)
-            const SliverFillRemaining(
-              child: Center(child: CircularProgressIndicator()),
+            SliverPadding(
+              padding: const EdgeInsets.fromLTRB(20, 0, 20, 100),
+              sliver: SliverList.separated(
+                itemCount: 5,
+                itemBuilder: (context, i) {
+                  return GoalSkeletonLoading();
+                },
+                separatorBuilder: (_, __) {
+                  return SizedBox(height: 10);
+                },
+              ),
             )
           else if (error != null && error.isNotEmpty)
             SliverFillRemaining(child: ErrorState(error: error))

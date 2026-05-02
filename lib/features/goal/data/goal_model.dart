@@ -19,7 +19,7 @@ class GoalModel {
     return GoalModel(
       id: json['id'] ?? "",
       name: json['name'] ?? "",
-      targetGpa: json['target_gpa'] ?? 0,
+      targetGpa: (json['target_gpa'] as num).toDouble(),
       isAchieved: json['is_achieved'] ?? false,
       targetSemesterId: json['target_semester_id'] ?? "",
       userId: json['user_id'] ?? "",
