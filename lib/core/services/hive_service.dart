@@ -8,6 +8,28 @@ import 'package:academic_planner_fe/core/services/goal_hive_service.dart';
 import 'package:academic_planner_fe/core/services/course_hive_service.dart';
 import 'package:academic_planner_fe/core/services/gpa_hive_service.dart';
 
+/// Helper function to calculate grade point from grade
+double _gradeToPoint(Grade grade) {
+  switch (grade) {
+    case Grade.A:
+      return 4.0;
+    case Grade.B_PLUS:
+      return 3.5;
+    case Grade.B:
+      return 3.0;
+    case Grade.C_PLUS:
+      return 2.5;
+    case Grade.C:
+      return 2.0;
+    case Grade.D_PLUS:
+      return 1.5;
+    case Grade.D:
+      return 1.0;
+    case Grade.F:
+      return 0.0;
+  }
+}
+
 /// Main Hive service that coordinates all specialized Hive services
 /// This service maintains backward compatibility while delegating to specialized services
 class HiveService {
@@ -293,6 +315,80 @@ class HiveService {
 
   /// Get the GPA service for advanced operations
   GpaHiveService get gpaService => _gpaService;
+
+  // ==================== GPA CALCULATION ====================
+
+  /// Calculate and update GPA for a semester based on its courses
+  Future<void> calculateAndUpdateGpa(String semesterId, String userId) async {
+    // Get all courses for this semester
+    final courses = getCoursesBySemester(semesterId);
+    
+    // Calculate GPA
+    double totalGradePoints = 0.0;
+    int totalCredits = 0;
+    
+    for (var course in courses) {
+      final gradePoint = _gradeToPoint(course.grade);
+      totalGradePoints += gradePoint * course.credit;
+      totalCredits += course.credit;
+    }
+    
+    final gpa = totalCredits > 0 ? totalGradePoints / totalCredits : 0.0;
+    
+    // Calculate cumulative GPA (average of all semesters)
+    final allGpas = getAllGpas();
+    double cumGpa = gpa; // Default to current GPA
+    
+    if (allGpas.isNotEmpty) {
+      double totalGpa = gpa;
+      int count = 1;
+      
+      for (var existingGpa in allGpas) {
+        if (existingGpa.semesterId != semesterId) {
+          totalGpa += existingGpa.gpa;
+          count++;
+        }
+      }
+      
+      cumGpa = totalGpa / count;
+    }
+    
+    // Create or update GPA model
+    final gpaModel = GpaModel(
+      userId: userId,
+      semesterId: semesterId,
+      gpa: gpa,
+      cumGpa: cumGpa,
+      totalCredit: totalCredits,
+      totalGradePoints: totalGradePoints,
+      calculatedAt: DateTime.now().toIso8601String(),
+    );
+    
+    await saveGpa(gpaModel);
+  }
+
+  /// Recalculate cumulative GPA for all semesters
+  Future<void> recalculateAllCumulativeGpas(String userId) async {
+    final allGpas = getAllGpas();
+    
+    if (allGpas.isEmpty) return;
+    
+    // Calculate average GPA
+    double totalGpa = 0.0;
+    for (var gpa in allGpas) {
+      totalGpa += gpa.gpa;
+    }
+    final cumGpa = totalGpa / allGpas.length;
+    
+    // Update all GPAs with new cumulative GPA
+    for (var gpa in allGpas) {
+      final updatedGpa = gpa.copyWith(
+        cumGpa: cumGpa,
+        calculatedAt: DateTime.now().toIso8601String(),
+      );
+      await updateGpa(updatedGpa);
+    }
+  }
 }
 
 // Made with Bob

@@ -1,6 +1,11 @@
 import 'package:academic_planner_fe/core/providers/api_providers.dart';
 import 'package:academic_planner_fe/core/services/term_api_service.dart';
+import 'package:academic_planner_fe/core/services/hive_service.dart';
+import 'package:academic_planner_fe/core/services/guest_mode_exceptions.dart';
+import 'package:academic_planner_fe/features/auth/providers/auth_provider.dart';
 import 'package:academic_planner_fe/features/term/data/term_model.dart';
+import 'package:academic_planner_fe/features/term/data/gpa_model.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 
 const _termSentinel = Object();
@@ -27,8 +32,12 @@ class TermState {
 
 class TermController extends StateNotifier<TermState> {
   final TermApiService _apiService;
+  final HiveService _hiveService;
+  final Ref _ref;
 
-  TermController(this._apiService) : super(TermState());
+  TermController(this._apiService, this._hiveService, this._ref) : super(TermState());
+
+  bool get _isLoggedIn => _ref.read(authProvider).user != null;
 
   Future<void> addTerm({
     required String term,
@@ -40,18 +49,55 @@ class TermController extends StateNotifier<TermState> {
     try {
       state = state.copyWith(isLoading: true, error: "");
 
-      final response = await _apiService.createTerm(
-        term: term,
-        year: year,
-        termNo: termNo,
-        isComplete: isComplete,
-      );
+      TermModel newTerm;
 
-      final newTerm = TermModel.fromJson(response['semester']);
+      if (_isLoggedIn) {
+        // User is logged in - use API
+        final response = await _apiService.createTerm(
+          term: term,
+          year: year,
+          termNo: termNo,
+          isComplete: isComplete,
+        );
+        newTerm = TermModel.fromJson(response['semester']);
+      } else {
+        // Guest mode - use Hive
+        final id = 'term_${DateTime.now().millisecondsSinceEpoch}';
+        newTerm = TermModel(
+          id: id,
+          term: term,
+          year: year,
+          termNo: termNo,
+          isComplete: isComplete,
+          userId: 'guest',
+          createdAt: DateTime.now().toIso8601String(),
+          courses: [],
+          gpas: [],
+        );
+        await _hiveService.saveTerm(newTerm);
+        
+        // Auto-create initial GPA record for the new semester
+        final initialGpa = GpaModel(
+          userId: 'guest',
+          semesterId: id,
+          gpa: 0.0,
+          cumGpa: 0.0,
+          totalCredit: 0,
+          totalGradePoints: 0.0,
+          calculatedAt: DateTime.now().toIso8601String(),
+        );
+        await _hiveService.saveGpa(initialGpa);
+      }
+
       state = state.copyWith(
         isLoading: false,
         error: "",
         terms: [...state.terms, newTerm],
+      );
+    } on SemesterLimitException catch (e) {
+      state = state.copyWith(
+        isLoading: false,
+        error: e.message,
       );
     } on Exception catch (e) {
       state = state.copyWith(
@@ -61,10 +107,13 @@ class TermController extends StateNotifier<TermState> {
     }
   }
 
-  Future<void> removeTerm(String termId) async{
-    final terms = state.terms.where(
-        (t) => t.id != termId
-    ).toList();
+  Future<void> removeTerm(String termId) async {
+    final terms = state.terms.where((t) => t.id != termId).toList();
+
+    if (!_isLoggedIn) {
+      // Guest mode - delete from Hive
+      await _hiveService.deleteTerm(termId);
+    }
 
     state = state.copyWith(terms: terms);
   }
@@ -73,11 +122,19 @@ class TermController extends StateNotifier<TermState> {
     if (state.isLoading) return;
     try {
       state = state.copyWith(isLoading: true, error: "");
-      final response = await _apiService.findTermsByUserId();
 
-      final terms = (response['semesters'] as List)
-          .map((e) => TermModel.fromJson(e as Map<String, dynamic>))
-          .toList();
+      List<TermModel> terms;
+
+      if (_isLoggedIn) {
+        // User is logged in - fetch from API
+        final response = await _apiService.findTermsByUserId();
+        terms = (response['semesters'] as List)
+            .map((e) => TermModel.fromJson(e as Map<String, dynamic>))
+            .toList();
+      } else {
+        // Guest mode - fetch from Hive
+        terms = _hiveService.getAllTerms();
+      }
 
       state = state.copyWith(isLoading: false, error: "", terms: terms);
     } on Exception catch (e) {
@@ -92,5 +149,9 @@ class TermController extends StateNotifier<TermState> {
 }
 
 final termProvider = StateNotifierProvider<TermController, TermState>((ref) {
-  return TermController(ref.read(termApiServiceProvider));
+  return TermController(
+    ref.read(termApiServiceProvider),
+    ref.read(hiveServiceProvider),
+    ref,
+  );
 });

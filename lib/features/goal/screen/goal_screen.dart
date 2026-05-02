@@ -163,7 +163,9 @@ class _GoalScreenState extends ConsumerState<GoalScreen> {
                 itemCount: termsGoal.length,
                 separatorBuilder: (_, __) => const SizedBox(height: 10),
                 itemBuilder: (context, index) => GoalCard(
-                  currentGpa: termsGoal[index].gpas[0].gpa,
+                  currentGpa: termsGoal[index].gpas.isNotEmpty
+                      ? termsGoal[index].gpas[0].gpa
+                      : 0.0,
                   goalName: goals[index].name,
                   termName: termsGoal[index].term,
                   termNo: termsGoal[index].termNo.toString(),
