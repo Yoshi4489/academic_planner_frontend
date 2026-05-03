@@ -59,12 +59,12 @@ class HiveService {
   /// Setup box references (call after init)
   void setupBoxes() {
     if (_isInitialized) return;
-    
+
     _termService.init();
     _goalService.init();
     _courseService.init();
     _gpaService.init();
-    
+
     _isInitialized = true;
   }
 
@@ -248,111 +248,48 @@ class HiveService {
     _isInitialized = false;
   }
 
-  // ==================== GUEST MODE LIMIT CHECKS ====================
-
-  /// Check if term limit is reached
-  bool isTermLimitReached() => _termService.isLimitReached();
-
-  /// Check if can add more terms
-  bool canAddMoreTerms() => _termService.canAddMore();
-
-  /// Get remaining term slots
-  int getRemainingTermSlots() => _termService.getRemainingSlots();
-
-  /// Check if goal limit is reached
-  bool isGoalLimitReached() => _goalService.isLimitReached();
-
-  /// Check if can add more goals
-  bool canAddMoreGoals() => _goalService.canAddMore();
-
-  /// Get remaining goal slots
-  int getRemainingGoalSlots() => _goalService.getRemainingSlots();
-
-  /// Check if course limit is reached
-  bool isCourseLimitReached() => _courseService.isLimitReached();
-
-  /// Check if can add more courses
-  bool canAddMoreCourses() => _courseService.canAddMore();
-
-  /// Get remaining course slots
-  int getRemainingCourseSlots() => _courseService.getRemainingSlots();
-
-  /// Get guest mode limits summary
-  Map<String, dynamic> getGuestModeLimits() {
-    return {
-      'terms': {
-        'current': _termService.getCount(),
-        'max': TermHiveService.maxGuestTerms,
-        'remaining': _termService.getRemainingSlots(),
-        'canAddMore': _termService.canAddMore(),
-      },
-      'goals': {
-        'current': _goalService.getCount(),
-        'max': GoalHiveService.maxGuestGoals,
-        'remaining': _goalService.getRemainingSlots(),
-        'canAddMore': _goalService.canAddMore(),
-      },
-      'courses': {
-        'current': _courseService.getCount(),
-        'max': CourseHiveService.maxGuestCourses,
-        'remaining': _courseService.getRemainingSlots(),
-        'canAddMore': _courseService.canAddMore(),
-      },
-    };
-  }
-
-  // ==================== DIRECT SERVICE ACCESS ====================
-  // For advanced use cases, you can access the specialized services directly
-
-  /// Get the term service for advanced operations
-  TermHiveService get termService => _termService;
-
-  /// Get the goal service for advanced operations
-  GoalHiveService get goalService => _goalService;
-
-  /// Get the course service for advanced operations
-  CourseHiveService get courseService => _courseService;
-
-  /// Get the GPA service for advanced operations
-  GpaHiveService get gpaService => _gpaService;
-
   // ==================== GPA CALCULATION ====================
 
   /// Calculate and update GPA for a semester based on its courses
   Future<void> calculateAndUpdateGpa(String semesterId, String userId) async {
     // Get all courses for this semester
     final courses = getCoursesBySemester(semesterId);
-    
+    TermModel? term = getTerm(semesterId);
+
+    if (term == null) {
+      return;
+    }
+
     // Calculate GPA
     double totalGradePoints = 0.0;
     int totalCredits = 0;
-    
+
     for (var course in courses) {
       final gradePoint = _gradeToPoint(course.grade);
       totalGradePoints += gradePoint * course.credit;
       totalCredits += course.credit;
     }
-    
+
     final gpa = totalCredits > 0 ? totalGradePoints / totalCredits : 0.0;
-    
+
     // Calculate cumulative GPA (average of all semesters)
     final allGpas = getAllGpas();
     double cumGpa = gpa; // Default to current GPA
-    
+
     if (allGpas.isNotEmpty) {
       double totalGpa = gpa;
       int count = 1;
-      
+
       for (var existingGpa in allGpas) {
         if (existingGpa.semesterId != semesterId) {
           totalGpa += existingGpa.gpa;
           count++;
         }
       }
-      
+
       cumGpa = totalGpa / count;
     }
-    
+
     // Create or update GPA model
     final gpaModel = GpaModel(
       userId: userId,
@@ -363,23 +300,26 @@ class HiveService {
       totalGradePoints: totalGradePoints,
       calculatedAt: DateTime.now().toIso8601String(),
     );
-    
+
+    term = term.copyWith(gpas: [gpaModel], courses: courses);
+
+    await updateTerm(term);
     await saveGpa(gpaModel);
   }
 
   /// Recalculate cumulative GPA for all semesters
   Future<void> recalculateAllCumulativeGpas(String userId) async {
     final allGpas = getAllGpas();
-    
+
     if (allGpas.isEmpty) return;
-    
+
     // Calculate average GPA
     double totalGpa = 0.0;
     for (var gpa in allGpas) {
       totalGpa += gpa.gpa;
     }
     final cumGpa = totalGpa / allGpas.length;
-    
+
     // Update all GPAs with new cumulative GPA
     for (var gpa in allGpas) {
       final updatedGpa = gpa.copyWith(
@@ -390,5 +330,3 @@ class HiveService {
     }
   }
 }
-
-// Made with Bob

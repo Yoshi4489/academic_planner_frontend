@@ -92,6 +92,7 @@ class CourseController extends StateNotifier<CourseState> {
           createdAt: DateTime.now().toIso8601String(),
           semesterId: semesterId,
         );
+
         await _hiveService.saveCourse(course);
         
         // Recalculate GPA for the semester after adding course

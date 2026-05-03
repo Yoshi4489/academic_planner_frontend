@@ -35,7 +35,8 @@ class TermController extends StateNotifier<TermState> {
   final HiveService _hiveService;
   final Ref _ref;
 
-  TermController(this._apiService, this._hiveService, this._ref) : super(TermState());
+  TermController(this._apiService, this._hiveService, this._ref)
+    : super(TermState());
 
   bool get _isLoggedIn => _ref.read(authProvider).user != null;
 
@@ -63,20 +64,6 @@ class TermController extends StateNotifier<TermState> {
       } else {
         // Guest mode - use Hive
         final id = 'term_${DateTime.now().millisecondsSinceEpoch}';
-        newTerm = TermModel(
-          id: id,
-          term: term,
-          year: year,
-          termNo: termNo,
-          isComplete: isComplete,
-          userId: 'guest',
-          createdAt: DateTime.now().toIso8601String(),
-          courses: [],
-          gpas: [],
-        );
-        await _hiveService.saveTerm(newTerm);
-        
-        // Auto-create initial GPA record for the new semester
         final initialGpa = GpaModel(
           userId: 'guest',
           semesterId: id,
@@ -86,6 +73,20 @@ class TermController extends StateNotifier<TermState> {
           totalGradePoints: 0.0,
           calculatedAt: DateTime.now().toIso8601String(),
         );
+        newTerm = TermModel(
+          id: id,
+          term: term,
+          year: year,
+          termNo: termNo,
+          isComplete: isComplete,
+          userId: 'guest',
+          createdAt: DateTime.now().toIso8601String(),
+          courses: [],
+          gpas: [initialGpa],
+        );
+        await _hiveService.saveTerm(newTerm);
+
+        // Auto-create initial GPA record for the new semester
         await _hiveService.saveGpa(initialGpa);
       }
 
@@ -95,10 +96,7 @@ class TermController extends StateNotifier<TermState> {
         terms: [...state.terms, newTerm],
       );
     } on SemesterLimitException catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        error: e.message,
-      );
+      state = state.copyWith(isLoading: false, error: e.message);
     } on Exception catch (e) {
       state = state.copyWith(
         isLoading: false,
@@ -112,7 +110,33 @@ class TermController extends StateNotifier<TermState> {
 
     if (!_isLoggedIn) {
       // Guest mode - delete from Hive
+      // Delete all goals associated with this semester
+      final goals = _hiveService.getAllGoals();
+      for (var goal in goals) {
+        if (goal.targetSemesterId == termId) {
+          await _hiveService.deleteGoal(goal.id);
+        }
+      }
+
+      // Delete all courses associated with this semester
+      final courses = _hiveService.getCoursesBySemester(termId);
+      for (var course in courses) {
+        await _hiveService.deleteCourse(course.id);
+      }
+
+      // Delete GPA records for this semester
+      final gpas = _hiveService.getAllGpas();
+      for (var gpa in gpas) {
+        if (gpa.semesterId == termId) {
+          await _hiveService.deleteGpa(gpa.semesterId);
+        }
+      }
+
+      // Finally delete the term itself
       await _hiveService.deleteTerm(termId);
+
+      // Recalculate cumulative GPA for remaining semesters
+      await _hiveService.recalculateAllCumulativeGpas('guest');
     }
 
     state = state.copyWith(terms: terms);
