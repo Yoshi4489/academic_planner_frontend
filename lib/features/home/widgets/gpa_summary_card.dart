@@ -85,7 +85,8 @@ class _GPASummaryCardState extends ConsumerState<GPASummaryCard> {
               textBaseline: TextBaseline.alphabetic,
               children: [
                 Text(
-                  "${_calcAvgGpa(term)}",
+
+                  _calcAvgGpa(term).toStringAsFixed(2),
                   style: GoogleFonts.goblinOne(
                     fontSize: 48,
                     color: Colors.white,

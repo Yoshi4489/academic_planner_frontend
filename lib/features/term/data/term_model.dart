@@ -34,10 +34,10 @@ class TermModel {
       createdAt: json['created_at'] ?? "",
       userId: json['user_id'] ?? "",
       courses: (json['courses'] as List<dynamic>? ?? [])
-          .map((e) => CourseModel.fromJson(e))
+          .map((e) => CourseModel.fromJson(Map<String, dynamic>.from(e as Map)))
           .toList(),
       gpas: (json['gpas'] as List<dynamic>? ?? [])
-          .map((e) => GpaModel.fromJson(e))
+          .map((e) => GpaModel.fromJson(Map<String, dynamic>.from(e as Map)))
           .toList(),
     );
   }

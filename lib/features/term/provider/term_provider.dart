@@ -88,6 +88,8 @@ class TermController extends StateNotifier<TermState> {
 
         // Auto-create initial GPA record for the new semester
         await _hiveService.saveGpa(initialGpa);
+        await _hiveService.calculateAndUpdateGpa(id, 'guest');
+        await _hiveService.recalculateAllCumulativeGpas('guest');
       }
 
       state = state.copyWith(

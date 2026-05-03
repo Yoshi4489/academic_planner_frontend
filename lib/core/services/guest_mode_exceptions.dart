@@ -19,12 +19,10 @@ class GuestModeLimitException implements Exception {
 /// Exception for semester limit
 class SemesterLimitException extends GuestModeLimitException {
   SemesterLimitException({
-    required int currentCount,
-    required int maxLimit,
+    required super.currentCount,
+    required super.maxLimit,
   }) : super(
           message: 'Guest mode limit reached: You can only create up to $maxLimit semesters. Please sign in to create more.',
-          currentCount: currentCount,
-          maxLimit: maxLimit,
           resourceType: 'semester',
         );
 }
