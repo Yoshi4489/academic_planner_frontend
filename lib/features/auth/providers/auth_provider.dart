@@ -8,7 +8,7 @@ import 'package:academic_planner_fe/features/term/provider/term_detail_provider.
 import 'package:academic_planner_fe/features/term/provider/term_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:academic_planner_fe/core/services/token_storage.dart';
 
 const _sentinel = Object();
 
@@ -40,15 +40,28 @@ class AuthState {
 class AuthController extends StateNotifier<AuthState> {
   final Ref _ref;
   late final AuthApiService _apiService;
-  final FlutterSecureStorage _storage = const FlutterSecureStorage();
+  final TokenStorage _storage;
 
-  AuthController(this._ref) : super(AuthState()) {
-    _apiService = AuthApiService(getAccessToken: () => state.accessToken);
+  AuthController(this._ref, {TokenStorage storage = const SecureTokenStorage()})
+    : _storage = storage,
+      super(AuthState()) {
+    _apiService = AuthApiService(
+      getAccessToken: () => state.accessToken,
+      storage: _storage,
+      onAccessTokenChanged: (token) {
+        state = state.copyWith(accessToken: token, error: null);
+      },
+      onAuthenticationFailed: () {
+        _resetSessionState();
+      },
+    );
   }
+
+  AuthApiService get apiService => _apiService;
 
   Future<void> initAuth() async {
     try {
-      final token = await _storage.read(key: 'refresh_token');
+      final token = await _storage.readRefreshToken();
 
       if (token == null) {
         return;
@@ -63,7 +76,7 @@ class AuthController extends StateNotifier<AuthState> {
         accessToken: response['access_token'],
       );
     } on Exception catch (e) {
-      await _storage.deleteAll();
+      await _storage.clear();
       state = state.copyWith(
         isLoading: false,
         error: e.toString().replaceFirst('Exception: ', ''),
@@ -80,10 +93,7 @@ class AuthController extends StateNotifier<AuthState> {
         email: email,
         password: password,
       );
-      await _storage.write(
-        key: 'refresh_token',
-        value: response['refresh_token'],
-      );
+      await _storage.writeRefreshToken(response['refresh_token'] as String);
       state = state.copyWith(
         isLoading: false,
         error: "",
@@ -106,10 +116,7 @@ class AuthController extends StateNotifier<AuthState> {
         email: email,
         password: password,
       );
-      await _storage.write(
-        key: 'refresh_token',
-        value: response['refresh_token'],
-      );
+      await _storage.writeRefreshToken(response['refresh_token'] as String);
       state = state.copyWith(
         isLoading: false,
         error: "",
@@ -125,8 +132,12 @@ class AuthController extends StateNotifier<AuthState> {
   }
 
   Future<void> logOut() async {
-    await _storage.deleteAll();
+    await _storage.clear();
 
+    _resetSessionState();
+  }
+
+  void _resetSessionState() {
     _ref.read(termProvider.notifier).reset();
     _ref.read(goalProvider.notifier).reset();
     _ref.read(courseProvider.notifier).reset();

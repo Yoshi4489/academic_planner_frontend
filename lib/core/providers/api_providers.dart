@@ -18,9 +18,7 @@ final authenticatedDioProvider = Provider<Dio>((ref) {
 });
 
 final authApiServiceProvider = Provider<AuthApiService>((ref) {
-  return AuthApiService(
-    getAccessToken: () => ref.read(authProvider).accessToken,
-  );
+  return ref.read(authProvider.notifier).apiService;
 });
 
 final courseApiServiceProvider = Provider<CourseApiService>((ref) {
