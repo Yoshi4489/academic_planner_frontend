@@ -1,0 +1,5 @@
+{
+  "E2E_EMAIL": "codex.verify.20260718171750@example.com",
+  "E2E_PASSWORD": "VerifyPass123!",
+  "API_BASE_URL": "https://academic-planner-backend-vfbf.onrender.com/api/v1"
+}
